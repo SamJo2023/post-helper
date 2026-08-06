@@ -25,6 +25,7 @@ const MARKERS = [
 
 // ====== URL 配置 ======
 const BASE_URL = process.env.POST_HELPER_BASE_URL || 'https://post-helper.hisamjo.live';
+const QRCODE_LIB_SRC = resolve(__dirname, 'template', 'qrcode.min.js');
 
 // 回复库每一行的格式：<!-- @reply <标签> <文本> -->
 const REPLY_LINE_RE = /<!--\s*@reply\s+([A-Za-z0-9+\-]+)\s+([\s\S]*?)\s*-->/g;
@@ -212,6 +213,14 @@ function renderNotePage(content) {
   return { id, outFile };
 }
 
+// 把 qrcode.min.js 拷到 dist 根，确保所有页面都能加载（无论子路径还是根）
+function shipQrcodeLib() {
+  if (!existsSync(QRCODE_LIB_SRC)) return;
+  mkdirSync(DIST_DIR, { recursive: true });
+  const dst = resolve(DIST_DIR, 'qrcode.min.js');
+  writeFileSync(dst, readFileSync(QRCODE_LIB_SRC, 'utf8'), 'utf8');
+}
+
 // 渲染根路径：扫草稿箱 + 已发布，找 mtime 最新且有 publish_id 的那篇
 function renderRootPage(vaultPath) {
   const candidates = [];
@@ -266,6 +275,8 @@ function cmdPublish(notePath) {
   const content = readFileSync(abs, 'utf8');
   const { outFile } = renderNotePage(content);
 
+  shipQrcodeLib();
+
   info(`\n已生成：${outFile}`);
   info(`本地预览：http://localhost:4173/<id>/  （先运行 preview 命令）\n`);
 }
@@ -281,6 +292,9 @@ function cmdShip(notePath) {
   // 根路径：需要 vault 路径
   const vaultPath = process.env.OBSIDIAN_VAULT || process.env.VAULT_PATH;
   if (vaultPath) renderRootPage(vaultPath);
+
+  // 把 qrcode.min.js 拷到 dist/ 根，所有页面都能加载
+  shipQrcodeLib();
 
   // git: 检查仓、add、commit、push
   if (!existsSync(resolve(__dirname, '.git'))) {
