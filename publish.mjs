@@ -5,7 +5,7 @@
 //   preview               本地起一个 http server，扫码预览
 //   help                  用法
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync, unlinkSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawn, spawnSync } from 'node:child_process';
@@ -317,7 +317,6 @@ function cmdShip(notePath) {
   }
 
   function runGitCapture(args) {
-    // 不继承 stdio，纯捕获输出
     return spawnSync('git', args, {
       cwd: __dirname,
       encoding: 'utf8',
@@ -326,23 +325,23 @@ function cmdShip(notePath) {
     });
   }
 
-  // git add -A 一次性 add 仓里所有变更（含未跟踪文件）
-  // 比分次 add 稳：避开 Git Bash + 多参数 + 中文路径的拆错 bug
-  // .gitignore 已配置好：node_modules/ test-fixtures/ 等会被自动排除
+  // git add -A 一次性 add 仓里所有变更，避开 Git Bash 多参数 bug
   const addCode = runGit(['add', '-A'], { stdio: 'pipe' });
   if (addCode !== 0) die(`git add 失败，退出码 ${addCode}`);
 
-  // 检测是否有变更，没就不 commit 直接 push 当前 main
+  // 检测是否有变更，没就不 commit 直接 push
   const statusResult = runGitCapture(['status', '--porcelain']);
   if (!statusResult.stdout || !statusResult.stdout.trim()) {
     info('本地没有任何变更可 commit，跳过 commit，只 push 当前 main');
   } else {
-    const msg = `ship: ${id}`;
-    // 用 -m 加 commit message，避开 heredoc / 多行字符串
-    const cmt = runGit(['commit', '-m', msg]);
-    if (cmt !== 0 && cmt !== 1) {
-      // 1 也可能是没有改变（已经被某种方式 fix 了），不当作错误
-      die(`git commit 失败，退出码 ${cmt}`);
+    // 用临时文件传 commit message，避免 shell 解析丢字
+    const msgFile = resolve(__dirname, '.git', '.ship-msg');
+    writeFileSync(msgFile, `ship: ${id}\n`, 'utf8');
+    try {
+      const cmt = runGit(['commit', '-F', msgFile]);
+      if (cmt !== 0 && cmt !== 1) die(`git commit 失败，退出码 ${cmt}`);
+    } finally {
+      try { unlinkSync(msgFile); } catch (_) {}
     }
   }
 
