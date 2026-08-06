@@ -47,6 +47,58 @@
     }
     .subtitle { font-size: 13px; color: var(--text-soft); margin: 0; }
 
+    .qr-card {
+      text-align: center;
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 18px 18px 14px;
+      margin-bottom: 14px;
+    }
+    .qr-card .qr-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--accent-deep);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .qr-card .qr-title .num {
+      width: 22px; height: 22px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .qr-img {
+      display: inline-block;
+      padding: 10px;
+      background: #fff;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      margin: 4px 0;
+    }
+    .qr-img img, .qr-img svg, .qr-img table {
+      display: block;
+      width: 180px;
+      height: 180px;
+    }
+    .qr-url {
+      font-size: 11px;
+      color: var(--text-soft);
+      word-break: break-all;
+      padding: 6px 4px 0;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+      line-height: 1.4;
+    }
+
     .card {
       background: var(--bg-card);
       border-radius: var(--radius);
@@ -213,6 +265,13 @@
     </header>
 
     <div class="tip">💡 用法：点对应按钮 → 自动复制 → 切到小红书直接粘贴。每段都是原始格式，不会多空格。</div>
+
+    <!-- 二维码：扫码打开此页 -->
+    <section class="qr-card" id="card-qr">
+      <div class="qr-title"><span class="num">⊕</span> 扫码打开此页</div>
+      <div class="qr-img" id="qr-img"></div>
+      <div class="qr-url" id="qr-url">https://post-helper.hisamjo.live/xiang-tai-duo/</div>
+    </section>
 
     <!-- 标题 -->
     <section class="card" id="card-title">
@@ -389,6 +448,7 @@ D：先做一个3天小实验
 
   <div class="toast" id="toast">已复制 ✓</div>
 
+  <script src="qrcode.min.js"></script>
   <script>
     const blocks = {
       title: "你是哪种「想太多」？4种思考天赋自测",
@@ -438,6 +498,23 @@ D：先做一个3天小实验
         copyText(btn.dataset.reply, btn);
       });
     });
+
+    // 二维码：以当前页 URL 生成（部署后浏览器自动拿 https://post-helper.hisamjo.live/...）
+    (function () {
+      var target = document.getElementById('qr-img');
+      var urlDisplay = document.getElementById('qr-url');
+      if (!target || typeof qrcode === 'undefined') return;
+      var url = window.location.href.split('#')[0];   // 去 hash
+      urlDisplay.textContent = url;
+      try {
+        var qr = qrcode(0, 'M');
+        qr.addData(url);
+        qr.make();
+        target.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 2, alt: '本页 URL 二维码' });
+      } catch (e) {
+        target.textContent = '二维码生成失败：' + e.message;
+      }
+    })();
   </script>
 </body>
 </html>

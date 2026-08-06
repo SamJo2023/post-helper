@@ -23,6 +23,9 @@ const MARKERS = [
   { key: 'CARDS',   name: 'POST_CARDS',   required: false },
 ];
 
+// ====== URL 配置 ======
+const BASE_URL = process.env.POST_HELPER_BASE_URL || 'https://post-helper.hisamjo.live';
+
 // 回复库每一行的格式：<!-- @reply <标签> <文本> -->
 const REPLY_LINE_RE = /<!--\s*@reply\s+([A-Za-z0-9+\-]+)\s+([\s\S]*?)\s*-->/g;
 
@@ -138,6 +141,7 @@ function render(template, ctx) {
     ['{{CARDS_TEXT}}', cardsText || '（未配置）'],
     ['{{CARDS_COUNT}}', String(countCardsPages(cardsText))],
     ['{{CARDS_JSON}}', safeJSON(cardsText)],
+    ['{{PAGE_URL}}', ctx.pageUrl],
     ['{{DATE}}', today()],
   ];
   for (const [k, v] of subs) {
@@ -197,6 +201,7 @@ function renderNotePage(content) {
     subtitle: `扫码打开 → 点按钮复制 → 切到小红书粘贴`,
     blocks,
     replies,
+    pageUrl: `${BASE_URL}/${id}/`,
   });
 
   const outDir = resolve(DIST_DIR, id);
@@ -245,6 +250,7 @@ function renderRootPage(vaultPath) {
     subtitle: `扫码打开 → 当前最新（自动同步）`,
     blocks,
     replies,
+    pageUrl: `${BASE_URL}/`,
   });
   const outFile = resolve(DIST_DIR, 'index.html');
   mkdirSync(DIST_DIR, { recursive: true });
@@ -292,7 +298,10 @@ function cmdShip(notePath) {
     }
   }
 
-  runGit(['add', 'dist/', '.gitignore', 'package.json', 'publish.mjs', 'README.md', 'template/']);
+  // 分次 add，避开 Git Bash 多参数 + 中文路径拆分问题
+  for (const p of ['dist', '.gitignore', 'package.json', 'publish.mjs', 'README.md', 'template']) {
+    runGit(['add', p], /*throwOnErr=*/false);
+  }
   runGit(['commit', '-m', `ship: ${id}`], /*throwOnErr=*/false);  // 没东西可 commit 时别炸
   runGit(['push', 'origin', 'main']);
   info('\n✓ 已推送到 main。Vercel 会自动部署。');
