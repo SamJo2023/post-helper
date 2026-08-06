@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#fdf6ee" />
+  <title>{{TITLE}} · 发布助手</title>
+  <style>
+    :root {
+      --bg: #fdf6ee;
+      --bg-card: #ffffff;
+      --text: #3a2e26;
+      --text-soft: #7a685a;
+      --accent: #e8826b;
+      --accent-deep: #c75a44;
+      --border: #efe2d0;
+      --success: #4caf50;
+      --radius: 14px;
+      --shadow: 0 2px 12px rgba(58, 46, 38, 0.06);
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap { max-width: 680px; margin: 0 auto; padding: 24px 18px 80px; }
+    header { text-align: center; padding: 8px 0 24px; }
+    header .badge {
+      display: inline-block;
+      background: rgba(232, 130, 107, 0.12);
+      color: var(--accent-deep);
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    h1 {
+      font-size: 22px;
+      margin: 12px 0 6px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .subtitle { font-size: 13px; color: var(--text-soft); margin: 0; }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 16px 18px;
+      margin-bottom: 14px;
+    }
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--accent-deep);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .card-title .num {
+      width: 22px; height: 22px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .meta { font-size: 11px; color: var(--text-soft); }
+
+    .preview {
+      background: #faf6f0;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 14px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 180px;
+      overflow-y: auto;
+      color: var(--text);
+      margin-bottom: 12px;
+      border: 1px dashed var(--border);
+    }
+
+    .copy-btn {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 14px 0;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      letter-spacing: 1px;
+    }
+    .copy-btn:active {
+      transform: scale(0.98);
+      background: var(--accent-deep);
+    }
+    .copy-btn.copied {
+      background: var(--success);
+    }
+
+    .replies-grid {
+      display: grid;
+      gap: 10px;
+    }
+    .reply-row {
+      display: grid;
+      grid-template-columns: 64px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: #faf6f0;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    .reply-tag {
+      background: var(--accent);
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+    }
+    .reply-text {
+      font-size: 13px;
+      color: var(--text-soft);
+      max-height: 3.2em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+    .mini-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .mini-btn:active { transform: scale(0.95); }
+    .mini-btn.copied { background: var(--success); }
+
+    .tip {
+      background: rgba(232, 130, 107, 0.08);
+      color: var(--accent-deep);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      margin: 16px 0;
+      line-height: 1.5;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 32px;
+      font-size: 11px;
+      color: var(--text-soft);
+      opacity: 0.6;
+    }
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(58, 46, 38, 0.92);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 99px;
+      font-size: 14px;
+      font-weight: 600;
+      opacity: 0;
+      transition: all 0.25s;
+      pointer-events: none;
+      z-index: 999;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <header>
+      <span class="badge">发布助手</span>
+      <h1>{{TITLE}}</h1>
+      <p class="subtitle">{{SUBTITLE}}</p>
+    </header>
+
+    <div class="tip">💡 用法：点对应按钮 → 自动复制 → 切到小红书直接粘贴。每段都是原始格式，不会多空格。</div>
+
+    <!-- 标题 -->
+    <section class="card" id="card-title">
+      <div class="card-head">
+        <div class="card-title"><span class="num">1</span> 发布标题</div>
+        <span class="meta">主推 1 条</span>
+      </div>
+      <div class="preview" id="prev-title">{{TITLE_TEXT}}</div>
+      <button class="copy-btn" data-target="title">点击复制标题</button>
+    </section>
+
+    <!-- 正文 -->
+    <section class="card" id="card-body">
+      <div class="card-head">
+        <div class="card-title"><span class="num">2</span> 小红书正文</div>
+        <span class="meta">{{BODY_LENGTH}} 字</span>
+      </div>
+      <div class="preview" id="prev-body">{{BODY_TEXT}}</div>
+      <button class="copy-btn" data-target="body">点击复制正文</button>
+    </section>
+
+    <!-- 置顶评论 -->
+    <section class="card" id="card-pin">
+      <div class="card-head">
+        <div class="card-title"><span class="num">3</span> 置顶评论</div>
+        <span class="meta">发布后立刻粘贴</span>
+      </div>
+      <div class="preview" id="prev-pin">{{PIN_TEXT}}</div>
+      <button class="copy-btn" data-target="pin">点击复制置顶评论</button>
+    </section>
+
+    <!-- 回复库 -->
+    <section class="card" id="card-replies">
+      <div class="card-head">
+        <div class="card-title"><span class="num">4</span> 评论回复库</div>
+        <span class="meta">{{REPLIES_COUNT}} 条预案</span>
+      </div>
+      <div class="replies-grid">
+        {{REPLIES_HTML}}
+      </div>
+    </section>
+
+    <!-- 大字报 -->
+    <section class="card" id="card-cards">
+      <div class="card-head">
+        <div class="card-title"><span class="num">5</span> 大字报文字稿</div>
+        <span class="meta">{{CARDS_COUNT}} 页</span>
+      </div>
+      <div class="preview" id="prev-cards">{{CARDS_TEXT}}</div>
+      <button class="copy-btn" data-target="cards">点击复制大字报全文</button>
+    </section>
+
+    <footer>
+      Generated by post-helper · {{DATE}}
+    </footer>
+  </div>
+
+  <div class="toast" id="toast">已复制 ✓</div>
+
+  <script>
+    const blocks = {
+      title: {{TITLE_JSON}},
+      body:  {{BODY_JSON}},
+      pin:   {{PIN_JSON}},
+      cards: {{CARDS_JSON}}
+    };
+
+    function showToast(text) {
+      const t = document.getElementById('toast');
+      t.textContent = text;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 1400);
+    }
+
+    async function copyText(text, btn) {
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (e) {
+        // 兜底方案：旧浏览器/HTTP
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed'; ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (_) {}
+        document.body.removeChild(ta);
+      }
+      btn.classList.add('copied');
+      const orig = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.textContent = orig;
+      }, 1200);
+      showToast('已复制 ✓ 切到小红书粘贴');
+    }
+
+    document.querySelectorAll('.copy-btn[data-target]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        copyText(blocks[btn.dataset.target], btn);
+      });
+    });
+
+    document.querySelectorAll('.mini-btn[data-reply]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        copyText(btn.dataset.reply, btn);
+      });
+    });
+  </script>
+</body>
+</html>
