@@ -305,19 +305,49 @@ function cmdShip(notePath) {
 
   info('\n开始 git 操作...');
 
-  function runGit(args, throwOnErr = true) {
-    const p = spawnSync('git', args, { cwd: __dirname, stdio: 'inherit', shell: true });
-    if (p.status !== 0 && throwOnErr) {
-      die(`git ${args.join(' ')} 退出码 ${p.status}`);
+  function runGit(args, opts = {}) {
+    const p = spawnSync('git', args, {
+      cwd: __dirname,
+      stdio: 'inherit',
+      shell: true,
+      env: { ...process.env, GIT_PAGER: 'cat' },
+      ...opts,
+    });
+    return p.status;
+  }
+
+  function runGitCapture(args) {
+    // 不继承 stdio，纯捕获输出
+    return spawnSync('git', args, {
+      cwd: __dirname,
+      encoding: 'utf8',
+      shell: true,
+      env: { ...process.env, GIT_PAGER: 'cat' },
+    });
+  }
+
+  // git add -A 一次性 add 仓里所有变更（含未跟踪文件）
+  // 比分次 add 稳：避开 Git Bash + 多参数 + 中文路径的拆错 bug
+  // .gitignore 已配置好：node_modules/ test-fixtures/ 等会被自动排除
+  const addCode = runGit(['add', '-A'], { stdio: 'pipe' });
+  if (addCode !== 0) die(`git add 失败，退出码 ${addCode}`);
+
+  // 检测是否有变更，没就不 commit 直接 push 当前 main
+  const statusResult = runGitCapture(['status', '--porcelain']);
+  if (!statusResult.stdout || !statusResult.stdout.trim()) {
+    info('本地没有任何变更可 commit，跳过 commit，只 push 当前 main');
+  } else {
+    const msg = `ship: ${id}`;
+    // 用 -m 加 commit message，避开 heredoc / 多行字符串
+    const cmt = runGit(['commit', '-m', msg]);
+    if (cmt !== 0 && cmt !== 1) {
+      // 1 也可能是没有改变（已经被某种方式 fix 了），不当作错误
+      die(`git commit 失败，退出码 ${cmt}`);
     }
   }
 
-  // 分次 add，避开 Git Bash 多参数 + 中文路径拆分问题
-  for (const p of ['dist', '.gitignore', 'package.json', 'publish.mjs', 'README.md', 'template']) {
-    runGit(['add', p], /*throwOnErr=*/false);
-  }
-  runGit(['commit', '-m', `ship: ${id}`], /*throwOnErr=*/false);  // 没东西可 commit 时别炸
-  runGit(['push', 'origin', 'main']);
+  const pushCode = runGit(['push', 'origin', 'main']);
+  if (pushCode !== 0) die(`git push 失败，退出码 ${pushCode}`);
   info('\n✓ 已推送到 main。Vercel 会自动部署。');
 }
 
