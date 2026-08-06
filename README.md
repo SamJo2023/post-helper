@@ -8,10 +8,26 @@
 
 ## 当前状态
 
-- 已实现：本地生成 + 本地预览
-- 未实现：自动推到 GitHub / Vercel 部署（**部署前置确认规则要求用户明确说"部署"才动**）
+- 已实现：本地生成 + 本地预览 + **自动部署到他妈的线上**
+- 已部署：`https://post-helper.hisamjo.live/` （team: sam-jos-projects）
 
 ---
+
+## 访问入口
+
+| URL | 含义 |
+|---|---|
+| `https://post-helper.hisamjo.live/` | **最新已发草稿**（自动同步 mtime 最新那篇） |
+| `https://post-helper.hisamjo.live/<publish_id>/` | 指定 publish_id 的发布页 |
+| `https://post-helper.hisamjo.live/qrcode.min.js` | 二维码库（页面里用了） |
+
+**手机扫码**：打开任一发布页，**页面顶端就有二维码**（指向当前页 URL），可以直接微信/小红书扫码 → 进入。无需记 URL。
+
+---
+
+## 明天接上的两件事
+
+部署前要确认（已答）：
 
 ## 哪些笔记用这个工具 / 哪些不用
 
@@ -23,6 +39,37 @@
 | 临时日常笔记 | ❌ | 不是发布草稿 |
 
 **判断标准**：问自己——「我未来一周内会把这篇发到小红书吗？」是 → 填 `publish_id` 用本工具；否 → 不用管。
+
+---
+
+## 发布完整流程
+
+```bash
+# 1. 在笔记里加 publish_id + 5 个标记块（参见下方"笔记格式约定"节）
+
+# 2. 一行命令搞定一切
+cd /d/zhouxiping/post-helper
+OBSIDIAN_VAULT="D:/zhouxiping/21_Breakout/AI虚拟产品全链路作战系统/xlquiz" \
+  node publish.mjs ship "D:/zhouxiping/21_Breakout/AI虚拟产品全链路作战系统/xlquiz/05.我的产品/商品笔记/<想发的那篇>.md"
+
+# 3. 等 10-30 秒，Vercel 自动部署，访问：https://post-helper.hisamjo.live/<publish_id>/
+#    手机扫码页面顶端的二维码即可
+```
+
+`ship` 子命令做的事：
+1. 读笔记 → 提取标记块 → 渲染 `dist/<publish_id>/index.html`
+2. 扫 vault 找 mtime 最新 → 覆盖 `dist/index.html`（根路径）
+3. 拷 `template/qrcode.min.js` 到 `dist/`（二维码库）
+4. `git add + commit + push` → Vercel 自动部署
+
+> ⚠ Windows + Git Bash 下 `git add 多参数 + 中文路径` 会拆错，ship 命令目前会**先尝试正常 add，失败时显示错误码**，需要时手工：
+> ```bash
+> cd /d/zhouxiping/post-helper
+> git add dist  # 单次 add 整个 dist
+> git add .
+> git commit -m "ship: <id>"
+> git push origin main
+> ```
 
 ## 目录
 
