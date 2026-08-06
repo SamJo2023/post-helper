@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#fdf6ee" />
+  <title>二创笔记｜你是哪种「想太多」？ · 发布助手</title>
+  <style>
+    :root {
+      --bg: #fdf6ee;
+      --bg-card: #ffffff;
+      --text: #3a2e26;
+      --text-soft: #7a685a;
+      --accent: #e8826b;
+      --accent-deep: #c75a44;
+      --border: #efe2d0;
+      --success: #4caf50;
+      --radius: 14px;
+      --shadow: 0 2px 12px rgba(58, 46, 38, 0.06);
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap { max-width: 680px; margin: 0 auto; padding: 24px 18px 80px; }
+    header { text-align: center; padding: 8px 0 24px; }
+    header .badge {
+      display: inline-block;
+      background: rgba(232, 130, 107, 0.12);
+      color: var(--accent-deep);
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    h1 {
+      font-size: 22px;
+      margin: 12px 0 6px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .subtitle { font-size: 13px; color: var(--text-soft); margin: 0; }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 16px 18px;
+      margin-bottom: 14px;
+    }
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--accent-deep);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .card-title .num {
+      width: 22px; height: 22px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .meta { font-size: 11px; color: var(--text-soft); }
+
+    .preview {
+      background: #faf6f0;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 14px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 180px;
+      overflow-y: auto;
+      color: var(--text);
+      margin-bottom: 12px;
+      border: 1px dashed var(--border);
+    }
+
+    .copy-btn {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 14px 0;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      letter-spacing: 1px;
+    }
+    .copy-btn:active {
+      transform: scale(0.98);
+      background: var(--accent-deep);
+    }
+    .copy-btn.copied {
+      background: var(--success);
+    }
+
+    .replies-grid {
+      display: grid;
+      gap: 10px;
+    }
+    .reply-row {
+      display: grid;
+      grid-template-columns: 64px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: #faf6f0;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    .reply-tag {
+      background: var(--accent);
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+    }
+    .reply-text {
+      font-size: 13px;
+      color: var(--text-soft);
+      max-height: 3.2em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+    .mini-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .mini-btn:active { transform: scale(0.95); }
+    .mini-btn.copied { background: var(--success); }
+
+    .tip {
+      background: rgba(232, 130, 107, 0.08);
+      color: var(--accent-deep);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      margin: 16px 0;
+      line-height: 1.5;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 32px;
+      font-size: 11px;
+      color: var(--text-soft);
+      opacity: 0.6;
+    }
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(58, 46, 38, 0.92);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 99px;
+      font-size: 14px;
+      font-weight: 600;
+      opacity: 0;
+      transition: all 0.25s;
+      pointer-events: none;
+      z-index: 999;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <header>
+      <span class="badge">发布助手</span>
+      <h1>二创笔记｜你是哪种「想太多」？</h1>
+      <p class="subtitle">扫码打开 → 点按钮复制 → 切到小红书粘贴</p>
+    </header>
+
+    <div class="tip">💡 用法：点对应按钮 → 自动复制 → 切到小红书直接粘贴。每段都是原始格式，不会多空格。</div>
+
+    <!-- 标题 -->
+    <section class="card" id="card-title">
+      <div class="card-head">
+        <div class="card-title"><span class="num">1</span> 发布标题</div>
+        <span class="meta">主推 1 条</span>
+      </div>
+      <div class="preview" id="prev-title">你是哪种「想太多」？4种思考天赋自测</div>
+      <button class="copy-btn" data-target="title">点击复制标题</button>
+    </section>
+
+    <!-- 正文 -->
+    <section class="card" id="card-body">
+      <div class="card-head">
+        <div class="card-title"><span class="num">2</span> 小红书正文</div>
+        <span class="meta">265 字</span>
+      </div>
+      <div class="preview" id="prev-body">"想太多"经常被当成一个缺点。
+
+可同样是想很多，背后可能是4种完全不同的能力：
+
+A 预演风险，是规划力
+B 研究信息，是分析力
+C 照顾感受，是共情力
+D 看见可能，是创造力
+
+真正需要调整的，不是把自己变成一个"什么都不想的人"。
+而是给思考设一个终点，让它最后落到行动上。
+
+我把4种类型各配了一条停止规则，放在图片里了。
+下次纠结时，可以回来对照一下：你是在发挥优势，还是被优势拖住了？
+
+大多数人会是两种混合。你更像哪两个？
+
+这是轻量自我观察，仅供参考。
+
+#性格测试 #自我探索 #认识自己 #停止内耗 #思考方式</div>
+      <button class="copy-btn" data-target="body">点击复制正文</button>
+    </section>
+
+    <!-- 置顶评论 -->
+    <section class="card" id="card-pin">
+      <div class="card-head">
+        <div class="card-title"><span class="num">3</span> 置顶评论</div>
+        <span class="meta">发布后立刻粘贴</span>
+      </div>
+      <div class="preview" id="prev-pin">这不是高低分，四种都有自己的优势。
+
+我更想看"组合"：
+A+C 常见于把所有人的反应都提前想一遍；
+B+D 常见于越研究越有新想法。
+
+你更像哪两个？</div>
+      <button class="copy-btn" data-target="pin">点击复制置顶评论</button>
+    </section>
+
+    <!-- 回复库 -->
+    <section class="card" id="card-replies">
+      <div class="card-head">
+        <div class="card-title"><span class="num">4</span> 评论回复库</div>
+        <span class="meta">6 条预案</span>
+      </div>
+      <div class="replies-grid">
+        
+      <div class="reply-row">
+        <span class="reply-tag">A+B</span>
+        <span class="reply-text">你是"谨慎研究型"。优势是想得深、很少草率决定；最容易卡在等一个百分百确定的答案。给决定设截止时间，…</span>
+        <button class="mini-btn" data-reply="你是&quot;谨慎研究型&quot;。优势是想得深、很少草率决定；最容易卡在等一个百分百确定的答案。给决定设截止时间，会比继续查资料更有效。">复制</button>
+      </div>
+
+      <div class="reply-row">
+        <span class="reply-tag">A+C</span>
+        <span class="reply-text">你是"责任共情型"。很会提前照顾风险和他人感受，但容易把所有后果都揽到自己身上。先分清"我的责任"和…</span>
+        <button class="mini-btn" data-reply="你是&quot;责任共情型&quot;。很会提前照顾风险和他人感受，但容易把所有后果都揽到自己身上。先分清&quot;我的责任&quot;和&quot;别人的情绪&quot;。">复制</button>
+      </div>
+
+      <div class="reply-row">
+        <span class="reply-tag">A+D</span>
+        <span class="reply-text">你是"创意规划型"。既能看到新可能，也会提前排雷。最容易出现的情况是方案做得很完整，却迟迟没开始。先…</span>
+        <button class="mini-btn" data-reply="你是&quot;创意规划型&quot;。既能看到新可能，也会提前排雷。最容易出现的情况是方案做得很完整，却迟迟没开始。先跑一个最小版本。">复制</button>
+      </div>
+
+      <div class="reply-row">
+        <span class="reply-tag">B+C</span>
+        <span class="reply-text">你是"洞察共情型"。既会研究信息，也会理解别人，适合分析和沟通类事情。做决定前先写自己的答案，避免信…</span>
+        <button class="mini-btn" data-reply="你是&quot;洞察共情型&quot;。既会研究信息，也会理解别人，适合分析和沟通类事情。做决定前先写自己的答案，避免信息和意见越收越多。">复制</button>
+      </div>
+
+      <div class="reply-row">
+        <span class="reply-tag">B+D</span>
+        <span class="reply-text">你是"学习创造型"。输入越多，越容易产生新点子。优势很强，但要防止一直学、一直换方向。每次输入后，强…</span>
+        <button class="mini-btn" data-reply="你是&quot;学习创造型&quot;。输入越多，越容易产生新点子。优势很强，但要防止一直学、一直换方向。每次输入后，强制输出一个小成果。">复制</button>
+      </div>
+
+      <div class="reply-row">
+        <span class="reply-tag">C+D</span>
+        <span class="reply-text">你是"共情创造型"。很容易从人的需求里发现新想法。需要留意的是：不要为了让所有人满意，不断修改自己的…</span>
+        <button class="mini-btn" data-reply="你是&quot;共情创造型&quot;。很容易从人的需求里发现新想法。需要留意的是：不要为了让所有人满意，不断修改自己的方向。先服务一个明确的人。">复制</button>
+      </div>
+      </div>
+    </section>
+
+    <!-- 大字报 -->
+    <section class="card" id="card-cards">
+      <div class="card-head">
+        <div class="card-title"><span class="num">5</span> 大字报文字稿</div>
+        <span class="meta">8 页</span>
+      </div>
+      <div class="preview" id="prev-cards">【第1页｜封面】
+3秒自测
+你是哪种「想太多」？
+第一反应选 A / B / C / D
+
+=== 第2页｜选择题 ===
+遇到一件重要、但没有标准答案的事，你的第一反应是？
+
+A 先把最坏的结果想一遍
+B 不停查资料，想彻底弄明白
+C 先想别人会不会失望
+D 脑子里同时冒出好几条新路
+
+别分析太久，选最像你的一个。
+
+=== 第3页｜A 预演型 ===
+你不是胆小，只是习惯在脑中提前排雷。
+隐藏优势：风险感知、规划力、责任感
+最容易卡住：把"可能发生"想成"一定会发生"
+你的停止规则：想清70%，就做第一步。
+
+=== 第4页｜B 研究型 ===
+你不是磨蹭，只是做决定前需要弄懂逻辑。
+隐藏优势：分析力、学习力、规律识别
+最容易卡住：用继续搜资料，推迟真正决定
+你的停止规则：限时20分钟收集信息，到点就选。
+
+=== 第5页｜C 共情型 ===
+你不是没有主见，只是会自动看见每个人的感受。
+隐藏优势：共情力、协调力、关系洞察
+最容易卡住：把别人的失望，当成自己的责任
+你的停止规则：问别人之前，先写下自己的答案。
+
+=== 第6页｜D 发散型 ===
+你不是三分钟热度，只是比别人更容易看见新可能。
+隐藏优势：创造力、连接力、适应力
+最容易卡住：每条路都想走，结果一条也没开始
+你的停止规则：选成本最低的一条，先试3天。
+
+=== 第7页｜核心反转 ===
+真正拖住你的，不一定是"想太多"。
+而是思考没有终点，也没有出口。
+
+A：70%清楚就行动
+B：20分钟后停止搜索
+C：先写自己的答案
+D：先做一个3天小实验
+
+想得多可以是优势，前提是最后落到一步行动。
+
+=== 第8页｜互动收尾 ===
+大多数人不是单一型，通常会有两种组合。
+你更像哪两个？A+B / A+C / A+D / B+C / B+D / C+D
+
+这张对照表适合留着。
+下次纠结时看一眼：我是在发挥优势，还是被优势拖住了？
+
+轻量自我观察，仅供参考。</div>
+      <button class="copy-btn" data-target="cards">点击复制大字报全文</button>
+    </section>
+
+    <footer>
+      Generated by post-helper · 2026-08-06
+    </footer>
+  </div>
+
+  <div class="toast" id="toast">已复制 ✓</div>
+
+  <script>
+    const blocks = {
+      title: "你是哪种「想太多」？4种思考天赋自测",
+      body:  "\"想太多\"经常被当成一个缺点。\n\n可同样是想很多，背后可能是4种完全不同的能力：\n\nA 预演风险，是规划力\nB 研究信息，是分析力\nC 照顾感受，是共情力\nD 看见可能，是创造力\n\n真正需要调整的，不是把自己变成一个\"什么都不想的人\"。\n而是给思考设一个终点，让它最后落到行动上。\n\n我把4种类型各配了一条停止规则，放在图片里了。\n下次纠结时，可以回来对照一下：你是在发挥优势，还是被优势拖住了？\n\n大多数人会是两种混合。你更像哪两个？\n\n这是轻量自我观察，仅供参考。\n\n#性格测试 #自我探索 #认识自己 #停止内耗 #思考方式",
+      pin:   "这不是高低分，四种都有自己的优势。\n\n我更想看\"组合\"：\nA+C 常见于把所有人的反应都提前想一遍；\nB+D 常见于越研究越有新想法。\n\n你更像哪两个？",
+      cards: "【第1页｜封面】\n3秒自测\n你是哪种「想太多」？\n第一反应选 A / B / C / D\n\n=== 第2页｜选择题 ===\n遇到一件重要、但没有标准答案的事，你的第一反应是？\n\nA 先把最坏的结果想一遍\nB 不停查资料，想彻底弄明白\nC 先想别人会不会失望\nD 脑子里同时冒出好几条新路\n\n别分析太久，选最像你的一个。\n\n=== 第3页｜A 预演型 ===\n你不是胆小，只是习惯在脑中提前排雷。\n隐藏优势：风险感知、规划力、责任感\n最容易卡住：把\"可能发生\"想成\"一定会发生\"\n你的停止规则：想清70%，就做第一步。\n\n=== 第4页｜B 研究型 ===\n你不是磨蹭，只是做决定前需要弄懂逻辑。\n隐藏优势：分析力、学习力、规律识别\n最容易卡住：用继续搜资料，推迟真正决定\n你的停止规则：限时20分钟收集信息，到点就选。\n\n=== 第5页｜C 共情型 ===\n你不是没有主见，只是会自动看见每个人的感受。\n隐藏优势：共情力、协调力、关系洞察\n最容易卡住：把别人的失望，当成自己的责任\n你的停止规则：问别人之前，先写下自己的答案。\n\n=== 第6页｜D 发散型 ===\n你不是三分钟热度，只是比别人更容易看见新可能。\n隐藏优势：创造力、连接力、适应力\n最容易卡住：每条路都想走，结果一条也没开始\n你的停止规则：选成本最低的一条，先试3天。\n\n=== 第7页｜核心反转 ===\n真正拖住你的，不一定是\"想太多\"。\n而是思考没有终点，也没有出口。\n\nA：70%清楚就行动\nB：20分钟后停止搜索\nC：先写自己的答案\nD：先做一个3天小实验\n\n想得多可以是优势，前提是最后落到一步行动。\n\n=== 第8页｜互动收尾 ===\n大多数人不是单一型，通常会有两种组合。\n你更像哪两个？A+B / A+C / A+D / B+C / B+D / C+D\n\n这张对照表适合留着。\n下次纠结时看一眼：我是在发挥优势，还是被优势拖住了？\n\n轻量自我观察，仅供参考。"
+    };
+
+    function showToast(text) {
+      const t = document.getElementById('toast');
+      t.textContent = text;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 1400);
+    }
+
+    async function copyText(text, btn) {
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (e) {
+        // 兜底方案：旧浏览器/HTTP
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed'; ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (_) {}
+        document.body.removeChild(ta);
+      }
+      btn.classList.add('copied');
+      const orig = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.textContent = orig;
+      }, 1200);
+      showToast('已复制 ✓ 切到小红书粘贴');
+    }
+
+    document.querySelectorAll('.copy-btn[data-target]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        copyText(blocks[btn.dataset.target], btn);
+      });
+    });
+
+    document.querySelectorAll('.mini-btn[data-reply]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        copyText(btn.dataset.reply, btn);
+      });
+    });
+  </script>
+</body>
+</html>
