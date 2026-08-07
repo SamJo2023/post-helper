@@ -270,7 +270,7 @@
     <!-- 二维码：扫码打开此页 -->
     <section class="qr-card" id="card-qr">
       <div class="qr-title"><span class="num">⊕</span> 扫码打开此页</div>
-      <div class="qr-img" id="qr-img"></div>
+      <div class="qr-img"><img id="qr-img" alt="本页 URL 二维码" /></div>
       <div class="qr-url" id="qr-url">https://post-helper.hisamjo.live/</div>
     </section>
 
@@ -433,7 +433,6 @@
 
   <div class="toast" id="toast">已复制 ✓</div>
 
-  <script src="qrcode.min.js"></script>
   <script>
     const blocks = {
       title: "30+女人真正需要的不是副业，是第二曲线",
@@ -484,21 +483,17 @@
       });
     });
 
-    // 二维码：以当前页 URL 生成（部署后浏览器自动拿 https://post-helper.hisamjo.live/...）
+    // 二维码：直接用静态图片 API（无需本地 QR 库）
     (function () {
-      var target = document.getElementById('qr-img');
+      var img = document.getElementById('qr-img');
       var urlDisplay = document.getElementById('qr-url');
-      if (!target || typeof qrcode === 'undefined') return;
-      var url = window.location.href.split('#')[0];   // 去 hash
-      urlDisplay.textContent = url;
-      try {
-        var qr = qrcode(0, 'M');
-        qr.addData(url);
-        qr.make();
-        target.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 2, alt: '本页 URL 二维码' });
-      } catch (e) {
-        target.textContent = '二维码生成失败：' + e.message;
-      }
+      if (!img) return;
+      var url = window.location.href.split('#')[0];
+      if (urlDisplay) urlDisplay.textContent = url;
+      img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=' + encodeURIComponent(url);
+      img.onerror = function () {
+        img.alt = '二维码加载失败，请直接访问 URL';
+      };
     })();
   </script>
 </body>
