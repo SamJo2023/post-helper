@@ -28,7 +28,8 @@ const BASE_URL = process.env.POST_HELPER_BASE_URL || 'https://post-helper.hisamj
 const QRCODE_LIB_SRC = resolve(__dirname, 'template', 'qrcode.min.js');
 
 // 回复库每一行的格式：<!-- @reply <标签> <文本> -->
-const REPLY_LINE_RE = /<!--\s*@reply\s+([A-Za-z0-9+\-]+)\s+([\s\S]*?)\s*-->/g;
+// 标签允许中英文 + emoji（用 Unicode 属性类，不限制具体字符）
+const REPLY_LINE_RE = /<!--\s*@reply\s+(\S+?)\s+([\s\S]*?)\s*-->/g;
 
 // ====== 工具函数 ======
 function die(msg) { console.error(`\n× ${msg}\n`); process.exit(1); }
