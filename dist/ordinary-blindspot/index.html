@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#fdf6ee" />
+  <base href="/" />
+  <title>二创笔记｜总觉得自己很普通？4种「普通人偏差」自测 · 发布助手</title>
+  <style>
+    :root {
+      --bg: #fdf6ee;
+      --bg-card: #ffffff;
+      --text: #3a2e26;
+      --text-soft: #7a685a;
+      --accent: #e8826b;
+      --accent-deep: #c75a44;
+      --border: #efe2d0;
+      --success: #4caf50;
+      --radius: 14px;
+      --shadow: 0 2px 12px rgba(58, 46, 38, 0.06);
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap { max-width: 680px; margin: 0 auto; padding: 24px 18px 80px; }
+    header { text-align: center; padding: 8px 0 24px; }
+    header .badge {
+      display: inline-block;
+      background: rgba(232, 130, 107, 0.12);
+      color: var(--accent-deep);
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    h1 {
+      font-size: 22px;
+      margin: 12px 0 6px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .subtitle { font-size: 13px; color: var(--text-soft); margin: 0; }
+
+    .qr-card {
+      text-align: center;
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 18px 18px 14px;
+      margin-bottom: 14px;
+    }
+    .qr-card .qr-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--accent-deep);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .qr-card .qr-title .num {
+      width: 22px; height: 22px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .qr-img {
+      display: inline-block;
+      padding: 10px;
+      background: #fff;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      margin: 4px 0;
+    }
+    .qr-img img, .qr-img svg, .qr-img table {
+      display: block;
+      width: 180px;
+      height: 180px;
+    }
+    .qr-url {
+      font-size: 11px;
+      color: var(--text-soft);
+      word-break: break-all;
+      padding: 6px 4px 0;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+      line-height: 1.4;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 16px 18px;
+      margin-bottom: 14px;
+    }
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--accent-deep);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .card-title .num {
+      width: 22px; height: 22px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .meta { font-size: 11px; color: var(--text-soft); }
+
+    .preview {
+      background: #faf6f0;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 14px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 180px;
+      overflow-y: auto;
+      color: var(--text);
+      margin-bottom: 12px;
+      border: 1px dashed var(--border);
+    }
+
+    .copy-btn {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 14px 0;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      letter-spacing: 1px;
+    }
+    .copy-btn:active {
+      transform: scale(0.98);
+      background: var(--accent-deep);
+    }
+    .copy-btn.copied {
+      background: var(--success);
+    }
+
+    .replies-grid {
+      display: grid;
+      gap: 10px;
+    }
+    .reply-row {
+      display: grid;
+      grid-template-columns: 64px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: #faf6f0;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    .reply-tag {
+      background: var(--accent);
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+    }
+    .reply-text {
+      font-size: 13px;
+      color: var(--text-soft);
+      max-height: 3.2em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+    .mini-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .mini-btn:active { transform: scale(0.95); }
+    .mini-btn.copied { background: var(--success); }
+
+    .tip {
+      background: rgba(232, 130, 107, 0.08);
+      color: var(--accent-deep);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      margin: 16px 0;
+      line-height: 1.5;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 32px;
+      font-size: 11px;
+      color: var(--text-soft);
+      opacity: 0.6;
+    }
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(58, 46, 38, 0.92);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 99px;
+      font-size: 14px;
+      font-weight: 600;
+      opacity: 0;
+      transition: all 0.25s;
+      pointer-events: none;
+      z-index: 999;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <header>
+      <span class="badge">发布助手</span>
+      <h1>二创笔记｜总觉得自己很普通？4种「普通人偏差」自测</h1>
+      <p class="subtitle">扫码打开 → 点按钮复制 → 切到小红书粘贴</p>
+    </header>
+
+    <div class="tip">💡 用法：点对应按钮 → 自动复制 → 切到小红书直接粘贴。每段都是原始格式，不会多空格。</div>
+
+    <!-- 二维码：扫码打开此页 -->
+    <section class="qr-card" id="card-qr">
+      <div class="qr-title"><span class="num">⊕</span> 扫码打开此页</div>
+      <div class="qr-img"><img id="qr-img" alt="本页 URL 二维码" /></div>
+      <div class="qr-url" id="qr-url">https://post-helper.hisamjo.live/ordinary-blindspot/</div>
+    </section>
+
+    <!-- 标题 -->
+    <section class="card" id="card-title">
+      <div class="card-head">
+        <div class="card-title"><span class="num">1</span> 发布标题</div>
+        <span class="meta">主推 1 条</span>
+      </div>
+      <div class="preview" id="prev-title">总觉得自己很普通？4种「普通人偏差」自测</div>
+      <button class="copy-btn" data-target="title">点击复制标题</button>
+    </section>
+
+    <!-- 正文 -->
+    <section class="card" id="card-body">
+      <div class="card-head">
+        <div class="card-title"><span class="num">2</span> 小红书正文</div>
+        <span class="meta">297 字</span>
+      </div>
+      <div class="preview" id="prev-body">"我就是个普通人。"
+
+这句话我们说过很多次。
+但有时候，"普通"不是事实，是一种偏差。
+
+大脑为了保护我们，会悄悄做 4 件事：
+1️⃣ 习惯抹掉自己的亮点
+2️⃣ 把别人的高光当常态
+3️⃣ 用"努力不够"解释一切不顺
+4️⃣ 等一个"准备好"的信号，结果永远没准备好
+
+这 4 件事不是性格，是**普通人偏差**。
+
+每一种偏差背后，
+都藏着一个被你自己忽略的特质。
+
+你是哪一种？
+或者说，哪一种组合？
+
+我把它做成了 8 页图卡，方便存下来。
+下次又陷入"我就是个普通人"的循环，翻出来看一眼。
+
+轻量自我观察，仅供参考。
+
+#自我探索 #普通人偏差 #认识自己 #停止内耗 #反鸡汤</div>
+      <button class="copy-btn" data-target="body">点击复制正文</button>
+    </section>
+
+    <!-- 置顶评论 -->
+    <section class="card" id="card-pin">
+      <div class="card-head">
+        <div class="card-title"><span class="num">3</span> 置顶评论</div>
+        <span class="meta">发布后立刻粘贴</span>
+      </div>
+      <div class="preview" id="prev-pin">"普通"有两种：
+一种是事实，一种是偏差。
+
+事实型的普通，需要接受；
+偏差型的普通，需要被看见。
+
+你觉得自己是哪种？我先看你的组合。</div>
+      <button class="copy-btn" data-target="pin">点击复制置顶评论</button>
+    </section>
+
+    <!-- 回复库 -->
+    <section class="card" id="card-replies">
+      <div class="card-head">
+        <div class="card-title"><span class="num">4</span> 评论回复库</div>
+        <span class="meta">8 条预案</span>
+      </div>
+      <div class="replies-grid">
+        
+      <div class="reply-row">
+        <span class="reply-tag">1</span>
+        <span class="reply-text">我是第一种 你可能只是对自己的"高光"免疫了。下次觉得自己普通，试着让一个朋友列 3 件你做过的事—…</span>
+        <button class="mini-btn" data-reply="我是第一种 你可能只是对自己的&quot;高光&quot;免疫了。下次觉得自己普通，试着让一个朋友列 3 件你做过的事——大概率你会愣住。">复制</button>
+      </div>
+
+      <div class="reply-row">
+        <span class="reply-tag">2</span>
+        <span class="reply-text">我是第二种 你不是不优秀，是你拿自己的日常，去比别人的高光。这不是事实比较，是镜头错位。下次刷到"别…</span>
+        <button class="mini-btn" data-reply="我是第二种 你不是不优秀，是你拿自己的日常，去比别人的高光。这不是事实比较，是镜头错位。下次刷到&quot;别人都……&quot;时，先问一句：这是她的日常，还是她想让我看到的样子？">复制</button>
+      </div>
+
+      <div class="reply-row">
+        <span class="reply-tag">3</span>
+        <span class="reply-text">我是第三种 你不是努力不够，是把所有不顺都归因到自己身上。试着把一件不顺的事拆开：是能力问题、时机问…</span>
+        <button class="mini-btn" data-reply="我是第三种 你不是努力不够，是把所有不顺都归因到自己身上。试着把一件不顺的事拆开：是能力问题、时机问题、还是规则问题？大部分时候不是你不努力。">复制</button>
+      </div>
+
+      <div class="reply-row">
+        <span class="reply-tag">4</span>
+        <span class="reply-text">我是第四种 你的"准备好"，其实是一个永远不到站的列车。没有人 100% 准备好过，先做一个 70 …</span>
+        <button class="mini-btn" data-reply="我是第四种 你的&quot;准备好&quot;，其实是一个永远不到站的列车。没有人 100% 准备好过，先做一个 70 分的版本，让它跑起来。">复制</button>
+      </div>
+
+      <div class="reply-row">
+        <span class="reply-tag">1+2</span>
+        <span class="reply-text">你容易同时低估自己、又高估别人。建议：每周固定一个时间，回顾自己本周做的 3 件具体的事，不用大，写…</span>
+        <button class="mini-btn" data-reply="你容易同时低估自己、又高估别人。建议：每周固定一个时间，回顾自己本周做的 3 件具体的事，不用大，写小的事。">复制</button>
+      </div>
+
+      <div class="reply-row">
+        <span class="reply-tag">1+3</span>
+        <span class="reply-text">你习惯把责任往自己身上揽。下次不顺时，先问"这件事 70% 是不是我决定的"——如果不是，先把那 3…</span>
+        <button class="mini-btn" data-reply="你习惯把责任往自己身上揽。下次不顺时，先问&quot;这件事 70% 是不是我决定的&quot;——如果不是，先把那 30% 还回去。">复制</button>
+      </div>
+
+      <div class="reply-row">
+        <span class="reply-tag">2+4</span>
+        <span class="reply-text">你看着别人很敢，自己却总在等。先承认：你不是不优秀，只是你看到的那部分人，也不是 100% 准备好才…</span>
+        <button class="mini-btn" data-reply="你看着别人很敢，自己却总在等。先承认：你不是不优秀，只是你看到的那部分人，也不是 100% 准备好才开始的。">复制</button>
+      </div>
+
+      <div class="reply-row">
+        <span class="reply-tag">3+4</span>
+        <span class="reply-text">你容易又自责、又拖延。下次"还没准备好"时，把任务拆到 30 分钟内能做完的一个最小动作。</span>
+        <button class="mini-btn" data-reply="你容易又自责、又拖延。下次&quot;还没准备好&quot;时，把任务拆到 30 分钟内能做完的一个最小动作。">复制</button>
+      </div>
+      </div>
+    </section>
+
+    <!-- 大字报 -->
+    <section class="card" id="card-cards">
+      <div class="card-head">
+        <div class="card-title"><span class="num">5</span> 大字报文字稿</div>
+        <span class="meta">8 页</span>
+      </div>
+      <div class="preview" id="prev-cards">【第1页｜封面】
+3秒自测
+总觉得自己很普通？
+4种「普通人偏差」
+
+你中了哪一种？
+第一反应选 1 / 2 / 3 / 4
+
+=== 第2页｜选择题 ===
+"我就是个普通人"——
+
+这种想法出现时，你心里更像是：
+
+1 觉得好像真没什么值得讲的
+2 觉得别人都比我过得好
+3 觉得是自己不够努力/不够好
+4 觉得还没准备好，等一等再说
+
+别分析太久。
+选最像你的一个。
+
+=== 第3页｜1 抹掉型 ===
+你不是真没亮点，
+是大脑习惯把你的亮点"过滤掉"了。
+
+隐藏机制：
+完成的事 → 不算数
+做砸的事 → 反复想
+
+试着：
+让一个朋友列 3 件你做过的事。
+
+=== 第4页｜2 镜头型 ===
+你不是不行，
+是你拿自己的日常，对别人的高光。
+
+隐藏机制：
+别人的"高光"被看见
+别人的"日常"没被看见
+
+下次刷到"别人都……"
+先问一句：
+这是她的日常，还是她想让我看到的样子？
+
+=== 第5页｜3 归因型 ===
+你不是不够努力，
+是你把所有不顺，都解释成自己的问题。
+
+隐藏机制：
+顺 → 是运气
+不顺 → 是我不够好
+
+试着把一件事拆开：
+是能力、时机、还是规则？
+大部分时候不是你。
+
+=== 第6页｜4 等待型 ===
+你不是没准备好，
+是"准备好"永远在下一站。
+
+隐藏机制：
+准备到 80% → 怕失败
+准备到 90% → 又发现新东西
+准备到 100% → 从未发生
+
+没有人 100% 准备好过。
+先做一个 70 分的版本，
+让它跑起来。
+
+=== 第7页｜核心反转 ===
+"普通"有两种：
+
+一种是事实。
+一种是大脑的偏差。
+
+事实型的普通，需要接受；
+偏差型的普通，需要被看见。
+
+4 种偏差，对应 4 件事：
+1 → 让别人列你的亮点
+2 → 区分"日常 vs 高光"
+3 → 把不顺拆成"能力/时机/规则"
+4 → 做一个 70 分的版本
+
+=== 第8页｜互动收尾 ===
+大多数人不是一种，
+通常是两种在叠加。
+
+你更像哪一个组合？
+1+2 又低估自己又高估别人
+1+3 总把责任往自己身上揽
+2+4 看着别人敢，自己总在等
+3+4 又自责又拖延
+
+这张图卡适合存下来。
+下次又陷入"我就是个普通人"的循环，
+翻出来看一眼。
+
+轻量自我观察，仅供参考。</div>
+      <button class="copy-btn" data-target="cards">点击复制大字报全文</button>
+    </section>
+
+    <footer>
+      Generated by post-helper · 2026-08-09
+    </footer>
+  </div>
+
+  <div class="toast" id="toast">已复制 ✓</div>
+
+  <script>
+    const blocks = {
+      title: "总觉得自己很普通？4种「普通人偏差」自测",
+      body:  "\"我就是个普通人。\"\n\n这句话我们说过很多次。\n但有时候，\"普通\"不是事实，是一种偏差。\n\n大脑为了保护我们，会悄悄做 4 件事：\n1️⃣ 习惯抹掉自己的亮点\n2️⃣ 把别人的高光当常态\n3️⃣ 用\"努力不够\"解释一切不顺\n4️⃣ 等一个\"准备好\"的信号，结果永远没准备好\n\n这 4 件事不是性格，是**普通人偏差**。\n\n每一种偏差背后，\n都藏着一个被你自己忽略的特质。\n\n你是哪一种？\n或者说，哪一种组合？\n\n我把它做成了 8 页图卡，方便存下来。\n下次又陷入\"我就是个普通人\"的循环，翻出来看一眼。\n\n轻量自我观察，仅供参考。\n\n#自我探索 #普通人偏差 #认识自己 #停止内耗 #反鸡汤",
+      pin:   "\"普通\"有两种：\n一种是事实，一种是偏差。\n\n事实型的普通，需要接受；\n偏差型的普通，需要被看见。\n\n你觉得自己是哪种？我先看你的组合。",
+      cards: "【第1页｜封面】\n3秒自测\n总觉得自己很普通？\n4种「普通人偏差」\n\n你中了哪一种？\n第一反应选 1 / 2 / 3 / 4\n\n=== 第2页｜选择题 ===\n\"我就是个普通人\"——\n\n这种想法出现时，你心里更像是：\n\n1 觉得好像真没什么值得讲的\n2 觉得别人都比我过得好\n3 觉得是自己不够努力/不够好\n4 觉得还没准备好，等一等再说\n\n别分析太久。\n选最像你的一个。\n\n=== 第3页｜1 抹掉型 ===\n你不是真没亮点，\n是大脑习惯把你的亮点\"过滤掉\"了。\n\n隐藏机制：\n完成的事 → 不算数\n做砸的事 → 反复想\n\n试着：\n让一个朋友列 3 件你做过的事。\n\n=== 第4页｜2 镜头型 ===\n你不是不行，\n是你拿自己的日常，对别人的高光。\n\n隐藏机制：\n别人的\"高光\"被看见\n别人的\"日常\"没被看见\n\n下次刷到\"别人都……\"\n先问一句：\n这是她的日常，还是她想让我看到的样子？\n\n=== 第5页｜3 归因型 ===\n你不是不够努力，\n是你把所有不顺，都解释成自己的问题。\n\n隐藏机制：\n顺 → 是运气\n不顺 → 是我不够好\n\n试着把一件事拆开：\n是能力、时机、还是规则？\n大部分时候不是你。\n\n=== 第6页｜4 等待型 ===\n你不是没准备好，\n是\"准备好\"永远在下一站。\n\n隐藏机制：\n准备到 80% → 怕失败\n准备到 90% → 又发现新东西\n准备到 100% → 从未发生\n\n没有人 100% 准备好过。\n先做一个 70 分的版本，\n让它跑起来。\n\n=== 第7页｜核心反转 ===\n\"普通\"有两种：\n\n一种是事实。\n一种是大脑的偏差。\n\n事实型的普通，需要接受；\n偏差型的普通，需要被看见。\n\n4 种偏差，对应 4 件事：\n1 → 让别人列你的亮点\n2 → 区分\"日常 vs 高光\"\n3 → 把不顺拆成\"能力/时机/规则\"\n4 → 做一个 70 分的版本\n\n=== 第8页｜互动收尾 ===\n大多数人不是一种，\n通常是两种在叠加。\n\n你更像哪一个组合？\n1+2 又低估自己又高估别人\n1+3 总把责任往自己身上揽\n2+4 看着别人敢，自己总在等\n3+4 又自责又拖延\n\n这张图卡适合存下来。\n下次又陷入\"我就是个普通人\"的循环，\n翻出来看一眼。\n\n轻量自我观察，仅供参考。"
+    };
+
+    function showToast(text) {
+      const t = document.getElementById('toast');
+      t.textContent = text;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 1400);
+    }
+
+    async function copyText(text, btn) {
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (e) {
+        // 兜底方案：旧浏览器/HTTP
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed'; ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (_) {}
+        document.body.removeChild(ta);
+      }
+      btn.classList.add('copied');
+      const orig = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.textContent = orig;
+      }, 1200);
+      showToast('已复制 ✓ 切到小红书粘贴');
+    }
+
+    document.querySelectorAll('.copy-btn[data-target]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        copyText(blocks[btn.dataset.target], btn);
+      });
+    });
+
+    document.querySelectorAll('.mini-btn[data-reply]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        copyText(btn.dataset.reply, btn);
+      });
+    });
+
+    // 二维码：直接用静态图片 API（无需本地 QR 库）
+    (function () {
+      var img = document.getElementById('qr-img');
+      var urlDisplay = document.getElementById('qr-url');
+      if (!img) return;
+      var url = window.location.href.split('#')[0];
+      if (urlDisplay) urlDisplay.textContent = url;
+      img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=' + encodeURIComponent(url);
+      img.onerror = function () {
+        img.alt = '二维码加载失败，请直接访问 URL';
+      };
+    })();
+  </script>
+</body>
+</html>
