@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#fdf6ee" />
+  <base href="/" />
+  <title>未命名笔记 · 发布助手</title>
+  <style>
+    :root {
+      --bg: #fdf6ee;
+      --bg-card: #ffffff;
+      --text: #3a2e26;
+      --text-soft: #7a685a;
+      --accent: #e8826b;
+      --accent-deep: #c75a44;
+      --border: #efe2d0;
+      --success: #4caf50;
+      --radius: 14px;
+      --shadow: 0 2px 12px rgba(58, 46, 38, 0.06);
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap { max-width: 680px; margin: 0 auto; padding: 24px 18px 80px; }
+    header { text-align: center; padding: 8px 0 24px; }
+    header .badge {
+      display: inline-block;
+      background: rgba(232, 130, 107, 0.12);
+      color: var(--accent-deep);
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    h1 {
+      font-size: 22px;
+      margin: 12px 0 6px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .subtitle { font-size: 13px; color: var(--text-soft); margin: 0; }
+
+    .qr-card {
+      text-align: center;
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 18px 18px 14px;
+      margin-bottom: 14px;
+    }
+    .qr-card .qr-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--accent-deep);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .qr-card .qr-title .num {
+      width: 22px; height: 22px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .qr-img {
+      display: inline-block;
+      padding: 10px;
+      background: #fff;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      margin: 4px 0;
+    }
+    .qr-img img, .qr-img svg, .qr-img table {
+      display: block;
+      width: 180px;
+      height: 180px;
+    }
+    .qr-url {
+      font-size: 11px;
+      color: var(--text-soft);
+      word-break: break-all;
+      padding: 6px 4px 0;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+      line-height: 1.4;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 16px 18px;
+      margin-bottom: 14px;
+    }
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--accent-deep);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .card-title .num {
+      width: 22px; height: 22px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .meta { font-size: 11px; color: var(--text-soft); }
+
+    .preview {
+      background: #faf6f0;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 14px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 180px;
+      overflow-y: auto;
+      color: var(--text);
+      margin-bottom: 12px;
+      border: 1px dashed var(--border);
+    }
+
+    .copy-btn {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 14px 0;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      letter-spacing: 1px;
+    }
+    .copy-btn:active {
+      transform: scale(0.98);
+      background: var(--accent-deep);
+    }
+    .copy-btn.copied {
+      background: var(--success);
+    }
+
+    .replies-grid {
+      display: grid;
+      gap: 10px;
+    }
+    .reply-row {
+      display: grid;
+      grid-template-columns: 64px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: #faf6f0;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    .reply-tag {
+      background: var(--accent);
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+    }
+    .reply-text {
+      font-size: 13px;
+      color: var(--text-soft);
+      max-height: 3.2em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+    .mini-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .mini-btn:active { transform: scale(0.95); }
+    .mini-btn.copied { background: var(--success); }
+
+    .tip {
+      background: rgba(232, 130, 107, 0.08);
+      color: var(--accent-deep);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      margin: 16px 0;
+      line-height: 1.5;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 32px;
+      font-size: 11px;
+      color: var(--text-soft);
+      opacity: 0.6;
+    }
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(58, 46, 38, 0.92);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 99px;
+      font-size: 14px;
+      font-weight: 600;
+      opacity: 0;
+      transition: all 0.25s;
+      pointer-events: none;
+      z-index: 999;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <header>
+      <span class="badge">发布助手</span>
+      <h1>未命名笔记</h1>
+      <p class="subtitle">扫码打开 → 点按钮复制 → 切到小红书粘贴</p>
+    </header>
+
+    <div class="tip">💡 用法：点对应按钮 → 自动复制 → 切到小红书直接粘贴。每段都是原始格式，不会多空格。</div>
+
+    <!-- 二维码：扫码打开此页 -->
+    <section class="qr-card" id="card-qr">
+      <div class="qr-title"><span class="num">⊕</span> 扫码打开此页</div>
+      <div class="qr-img"><img id="qr-img" alt="本页 URL 二维码" /></div>
+      <div class="qr-url" id="qr-url">https://post-helper.hisamjo.live/w33-note07-cat-personality/</div>
+    </section>
+
+    <!-- 标题 -->
+    <section class="card" id="card-title">
+      <div class="card-head">
+        <div class="card-title"><span class="num">1</span> 发布标题</div>
+        <span class="meta">主推 1 条</span>
+      </div>
+      <div class="preview" id="prev-title">你的性格最像哪种猫？测完发闺蜜，她说比星座准</div>
+      <button class="copy-btn" data-target="title">点击复制标题</button>
+    </section>
+
+    <!-- 正文 -->
+    <section class="card" id="card-body">
+      <div class="card-head">
+        <div class="card-title"><span class="num">2</span> 小红书正文</div>
+        <span class="meta">120 字</span>
+      </div>
+      <div class="preview" id="prev-body">养猫的人都知道——每只猫的性格完全不一样。
+
+高冷布偶、黏人橘猫、社牛暹罗、佛系英短……
+
+测测你的性格最像哪种猫，发给你朋友看看她们认不认 👇
+
+我测出来是🐈‍⬛黑猫，闺蜜说"就是你没错了"
+
+#性格测试 #猫系人格 #娱乐测试 #猫</div>
+      <button class="copy-btn" data-target="body">点击复制正文</button>
+    </section>
+
+    <!-- 置顶评论 -->
+    <section class="card" id="card-pin">
+      <div class="card-head">
+        <div class="card-title"><span class="num">3</span> 置顶评论</div>
+        <span class="meta">发布后立刻粘贴</span>
+      </div>
+      <div class="preview" id="prev-pin">我是🐈‍⬛黑猫型——独立又记仇，但对自己人好到没底线。你呢？评论区说说你的猫系人格，看看有没有同款铲屎官～</div>
+      <button class="copy-btn" data-target="pin">点击复制置顶评论</button>
+    </section>
+
+    <!-- 回复库 -->
+    <section class="card" id="card-replies">
+      <div class="card-head">
+        <div class="card-title"><span class="num">4</span> 评论回复库</div>
+        <span class="meta">6 条预案</span>
+      </div>
+      <div class="replies-grid">
+        
+      <div class="reply-row">
+        <span class="reply-tag">🐱橘猫型</span>
+        <span class="reply-text">你不是懒，是节能模式。平时能躺着绝不坐着，但一旦有目标——执行力拉满。你的隐藏技能：关键时刻从不掉链…</span>
+        <button class="mini-btn" data-reply="你不是懒，是节能模式。平时能躺着绝不坐着，但一旦有目标——执行力拉满。你的隐藏技能：关键时刻从不掉链子。">复制</button>
+      </div>
+
+      <div class="reply-row">
+        <span class="reply-tag">🐈暹罗型</span>
+        <span class="reply-text">你不是话多，是太聪明了脑子停不下来。社交对你来说是充电不是耗电。你的隐藏技能：在任何场合都能交到朋友…</span>
+        <button class="mini-btn" data-reply="你不是话多，是太聪明了脑子停不下来。社交对你来说是充电不是耗电。你的隐藏技能：在任何场合都能交到朋友。">复制</button>
+      </div>
+
+      <div class="reply-row">
+        <span class="reply-tag">😺布偶型</span>
+        <span class="reply-text">你不是高冷，是社恐伪装成高冷。内心戏超多但嘴上不说。你的隐藏技能：观察力满级，默默记住了所有人的喜好…</span>
+        <button class="mini-btn" data-reply="你不是高冷，是社恐伪装成高冷。内心戏超多但嘴上不说。你的隐藏技能：观察力满级，默默记住了所有人的喜好。">复制</button>
+      </div>
+
+      <div class="reply-row">
+        <span class="reply-tag">🐈‍⬛黑猫型</span>
+        <span class="reply-text">你独立、记仇、但对认定的几个人好到没底线。别人觉得你神秘，其实你只是懒得解释。你的隐藏技能：第六感准…</span>
+        <button class="mini-btn" data-reply="你独立、记仇、但对认定的几个人好到没底线。别人觉得你神秘，其实你只是懒得解释。你的隐藏技能：第六感准得离谱。">复制</button>
+      </div>
+
+      <div class="reply-row">
+        <span class="reply-tag">🐱英短型</span>
+        <span class="reply-text">你不是佛系，是情绪过于稳定。天塌了你先喝杯茶。你的隐藏技能：所有人慌的时候你是定心丸。</span>
+        <button class="mini-btn" data-reply="你不是佛系，是情绪过于稳定。天塌了你先喝杯茶。你的隐藏技能：所有人慌的时候你是定心丸。">复制</button>
+      </div>
+
+      <div class="reply-row">
+        <span class="reply-tag">测完发给你的猫系朋友看看！关注我，每周一个新测试～</span>
+        <span class="reply-text"></span>
+        <button class="mini-btn" data-reply="">复制</button>
+      </div>
+      </div>
+    </section>
+
+    <!-- 大字报 -->
+    <section class="card" id="card-cards">
+      <div class="card-head">
+        <div class="card-title"><span class="num">5</span> 大字报文字稿</div>
+        <span class="meta">7 页</span>
+      </div>
+      <div class="preview" id="prev-cards">【第1页｜封面】
+你的性格最像哪种猫？
+
+🐱 橘猫
+🐈 暹罗
+😺 布偶
+🐈‍⬛ 黑猫
+🐱 英短
+
+测完发朋友，她们说比星座准！
+
+=== 第2页｜自测题 ===
+5道题，看看你是哪只猫
+
+1. 周末最想做什么？
+2. 陌生人多你会？
+3. 被惹到了你会？
+4. 朋友对你的评价是？
+5. 你的人生信条是？
+
+凭第一反应选，翻页看结果 👉
+
+=== 第3页｜🐱 橘猫型 ===
+🐱 橘猫型
+
+"你不是懒，是节能模式。"
+
+平时能躺着绝不坐着，能省一步绝不多走。
+但一旦有目标——执行力拉满。
+大家都以为你不上心，关键时刻你从不掉链子。
+适合的工作：有自己的节奏、不需要每天被催的活。
+最适合的周末：睡到自然醒，醒了继续躺着。
+
+=== 第4页｜🐈 暹罗型 ===
+🐈 暹罗型
+
+"你不是话多，是脑子太快嘴跟不上。"
+
+社交对你来说是充电不是耗电。
+能聊、能玩、去哪都能交到朋友。
+但有时候别人跟不上你的节奏——不是你的问题，是你需要找到同频的人。
+适合的工作：需要沟通和创意的活，别关在小隔间里。
+最适合的周末：约朋友，约朋友，还是约朋友。
+
+=== 第5页｜😺 布偶型 ===
+😺 布偶型
+
+"你不是高冷，是社恐伪装成高冷。"
+
+内心戏超多但嘴上不说。别人以为你不在意，其实你什么都记着。
+默默观察、默默关心、默默记住所有人的喜好。
+适合的工作：不需要大量社交、独立作业的活。
+最适合的周末：一个人待着，看书、追剧、发呆——完美。
+
+=== 第6页｜🐈‍⬛ 黑猫型 ===
+🐈‍⬛ 黑猫型
+
+"你不是神秘，是筛选门槛太高。"
+
+独立、记仇、但对认定的几个人好到没底线。
+世界上只有两种人：你不感兴趣的、和你愿意为之付出的。
+别人觉得你难接近——其实是他们没通过你的筛选。
+适合的工作：需要深度和独立判断的活。
+最适合的周末：和那两三个"通关的人"待在一起。
+
+=== 第7页｜互动收尾 ===
+你是哪种猫系人格？
+
+评论区报品种 🐱
+截图发给朋友看看她们认不认！
+
+📌 关注我，每周五一个轻松小测试，周末发朋友刚刚好～</div>
+      <button class="copy-btn" data-target="cards">点击复制大字报全文</button>
+    </section>
+
+    <footer>
+      Generated by post-helper · 2026-08-11
+    </footer>
+  </div>
+
+  <div class="toast" id="toast">已复制 ✓</div>
+
+  <script>
+    const blocks = {
+      title: "你的性格最像哪种猫？测完发闺蜜，她说比星座准",
+      body:  "养猫的人都知道——每只猫的性格完全不一样。\n\n高冷布偶、黏人橘猫、社牛暹罗、佛系英短……\n\n测测你的性格最像哪种猫，发给你朋友看看她们认不认 👇\n\n我测出来是🐈‍⬛黑猫，闺蜜说\"就是你没错了\"\n\n#性格测试 #猫系人格 #娱乐测试 #猫",
+      pin:   "我是🐈‍⬛黑猫型——独立又记仇，但对自己人好到没底线。你呢？评论区说说你的猫系人格，看看有没有同款铲屎官～",
+      cards: "【第1页｜封面】\n你的性格最像哪种猫？\n\n🐱 橘猫\n🐈 暹罗\n😺 布偶\n🐈‍⬛ 黑猫\n🐱 英短\n\n测完发朋友，她们说比星座准！\n\n=== 第2页｜自测题 ===\n5道题，看看你是哪只猫\n\n1. 周末最想做什么？\n2. 陌生人多你会？\n3. 被惹到了你会？\n4. 朋友对你的评价是？\n5. 你的人生信条是？\n\n凭第一反应选，翻页看结果 👉\n\n=== 第3页｜🐱 橘猫型 ===\n🐱 橘猫型\n\n\"你不是懒，是节能模式。\"\n\n平时能躺着绝不坐着，能省一步绝不多走。\n但一旦有目标——执行力拉满。\n大家都以为你不上心，关键时刻你从不掉链子。\n适合的工作：有自己的节奏、不需要每天被催的活。\n最适合的周末：睡到自然醒，醒了继续躺着。\n\n=== 第4页｜🐈 暹罗型 ===\n🐈 暹罗型\n\n\"你不是话多，是脑子太快嘴跟不上。\"\n\n社交对你来说是充电不是耗电。\n能聊、能玩、去哪都能交到朋友。\n但有时候别人跟不上你的节奏——不是你的问题，是你需要找到同频的人。\n适合的工作：需要沟通和创意的活，别关在小隔间里。\n最适合的周末：约朋友，约朋友，还是约朋友。\n\n=== 第5页｜😺 布偶型 ===\n😺 布偶型\n\n\"你不是高冷，是社恐伪装成高冷。\"\n\n内心戏超多但嘴上不说。别人以为你不在意，其实你什么都记着。\n默默观察、默默关心、默默记住所有人的喜好。\n适合的工作：不需要大量社交、独立作业的活。\n最适合的周末：一个人待着，看书、追剧、发呆——完美。\n\n=== 第6页｜🐈‍⬛ 黑猫型 ===\n🐈‍⬛ 黑猫型\n\n\"你不是神秘，是筛选门槛太高。\"\n\n独立、记仇、但对认定的几个人好到没底线。\n世界上只有两种人：你不感兴趣的、和你愿意为之付出的。\n别人觉得你难接近——其实是他们没通过你的筛选。\n适合的工作：需要深度和独立判断的活。\n最适合的周末：和那两三个\"通关的人\"待在一起。\n\n=== 第7页｜互动收尾 ===\n你是哪种猫系人格？\n\n评论区报品种 🐱\n截图发给朋友看看她们认不认！\n\n📌 关注我，每周五一个轻松小测试，周末发朋友刚刚好～"
+    };
+
+    function showToast(text) {
+      const t = document.getElementById('toast');
+      t.textContent = text;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 1400);
+    }
+
+    async function copyText(text, btn) {
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (e) {
+        // 兜底方案：旧浏览器/HTTP
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed'; ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (_) {}
+        document.body.removeChild(ta);
+      }
+      btn.classList.add('copied');
+      const orig = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.textContent = orig;
+      }, 1200);
+      showToast('已复制 ✓ 切到小红书粘贴');
+    }
+
+    document.querySelectorAll('.copy-btn[data-target]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        copyText(blocks[btn.dataset.target], btn);
+      });
+    });
+
+    document.querySelectorAll('.mini-btn[data-reply]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        copyText(btn.dataset.reply, btn);
+      });
+    });
+
+    // 二维码：直接用静态图片 API（无需本地 QR 库）
+    (function () {
+      var img = document.getElementById('qr-img');
+      var urlDisplay = document.getElementById('qr-url');
+      if (!img) return;
+      var url = window.location.href.split('#')[0];
+      if (urlDisplay) urlDisplay.textContent = url;
+      img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=' + encodeURIComponent(url);
+      img.onerror = function () {
+        img.alt = '二维码加载失败，请直接访问 URL';
+      };
+    })();
+  </script>
+</body>
+</html>
