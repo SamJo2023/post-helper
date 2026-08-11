@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#fdf6ee" />
+  <base href="/" />
+  <title>未命名笔记 · 发布助手</title>
+  <style>
+    :root {
+      --bg: #fdf6ee;
+      --bg-card: #ffffff;
+      --text: #3a2e26;
+      --text-soft: #7a685a;
+      --accent: #e8826b;
+      --accent-deep: #c75a44;
+      --border: #efe2d0;
+      --success: #4caf50;
+      --radius: 14px;
+      --shadow: 0 2px 12px rgba(58, 46, 38, 0.06);
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap { max-width: 680px; margin: 0 auto; padding: 24px 18px 80px; }
+    header { text-align: center; padding: 8px 0 24px; }
+    header .badge {
+      display: inline-block;
+      background: rgba(232, 130, 107, 0.12);
+      color: var(--accent-deep);
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    h1 {
+      font-size: 22px;
+      margin: 12px 0 6px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .subtitle { font-size: 13px; color: var(--text-soft); margin: 0; }
+
+    .qr-card {
+      text-align: center;
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 18px 18px 14px;
+      margin-bottom: 14px;
+    }
+    .qr-card .qr-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--accent-deep);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .qr-card .qr-title .num {
+      width: 22px; height: 22px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .qr-img {
+      display: inline-block;
+      padding: 10px;
+      background: #fff;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      margin: 4px 0;
+    }
+    .qr-img img, .qr-img svg, .qr-img table {
+      display: block;
+      width: 180px;
+      height: 180px;
+    }
+    .qr-url {
+      font-size: 11px;
+      color: var(--text-soft);
+      word-break: break-all;
+      padding: 6px 4px 0;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+      line-height: 1.4;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 16px 18px;
+      margin-bottom: 14px;
+    }
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--accent-deep);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .card-title .num {
+      width: 22px; height: 22px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .meta { font-size: 11px; color: var(--text-soft); }
+
+    .preview {
+      background: #faf6f0;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 14px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 180px;
+      overflow-y: auto;
+      color: var(--text);
+      margin-bottom: 12px;
+      border: 1px dashed var(--border);
+    }
+
+    .copy-btn {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 14px 0;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      letter-spacing: 1px;
+    }
+    .copy-btn:active {
+      transform: scale(0.98);
+      background: var(--accent-deep);
+    }
+    .copy-btn.copied {
+      background: var(--success);
+    }
+
+    .replies-grid {
+      display: grid;
+      gap: 10px;
+    }
+    .reply-row {
+      display: grid;
+      grid-template-columns: 64px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: #faf6f0;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    .reply-tag {
+      background: var(--accent);
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+    }
+    .reply-text {
+      font-size: 13px;
+      color: var(--text-soft);
+      max-height: 3.2em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+    .mini-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .mini-btn:active { transform: scale(0.95); }
+    .mini-btn.copied { background: var(--success); }
+
+    .tip {
+      background: rgba(232, 130, 107, 0.08);
+      color: var(--accent-deep);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      margin: 16px 0;
+      line-height: 1.5;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 32px;
+      font-size: 11px;
+      color: var(--text-soft);
+      opacity: 0.6;
+    }
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(58, 46, 38, 0.92);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 99px;
+      font-size: 14px;
+      font-weight: 600;
+      opacity: 0;
+      transition: all 0.25s;
+      pointer-events: none;
+      z-index: 999;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <header>
+      <span class="badge">发布助手</span>
+      <h1>未命名笔记</h1>
+      <p class="subtitle">扫码打开 → 点按钮复制 → 切到小红书粘贴</p>
+    </header>
+
+    <div class="tip">💡 用法：点对应按钮 → 自动复制 → 切到小红书直接粘贴。每段都是原始格式，不会多空格。</div>
+
+    <!-- 二维码：扫码打开此页 -->
+    <section class="qr-card" id="card-qr">
+      <div class="qr-title"><span class="num">⊕</span> 扫码打开此页</div>
+      <div class="qr-img"><img id="qr-img" alt="本页 URL 二维码" /></div>
+      <div class="qr-url" id="qr-url">https://post-helper.hisamjo.live/w33-note04-social-corner/</div>
+    </section>
+
+    <!-- 标题 -->
+    <section class="card" id="card-title">
+      <div class="card-head">
+        <div class="card-title"><span class="num">1</span> 发布标题</div>
+        <span class="meta">主推 1 条</span>
+      </div>
+      <div class="preview" id="prev-title">选一个最舒服的角落，暴露你藏最深的性格天赋</div>
+      <button class="copy-btn" data-target="title">点击复制标题</button>
+    </section>
+
+    <!-- 正文 -->
+    <section class="card" id="card-body">
+      <div class="card-head">
+        <div class="card-title"><span class="num">2</span> 小红书正文</div>
+        <span class="meta">116 字</span>
+      </div>
+      <div class="preview" id="prev-body">每个人的"舒适区"都不一样。
+
+有人喜欢窗边，有人喜欢角落，有人一定要背对墙——
+你无意识的选择，其实在暴露你真正的性格天赋。
+
+4个角落，凭第一感觉选一个，看看你的隐藏人格是什么 👇
+
+#性格测试 #天赋 #社交人格 #自我探索</div>
+      <button class="copy-btn" data-target="body">点击复制正文</button>
+    </section>
+
+    <!-- 置顶评论 -->
+    <section class="card" id="card-pin">
+      <div class="card-head">
+        <div class="card-title"><span class="num">3</span> 置顶评论</div>
+        <span class="meta">发布后立刻粘贴</span>
+      </div>
+      <div class="preview" id="prev-pin">我选了☕靠窗位，结果说我是"观察者型"——看完觉得确实是我。你呢？评论区告诉我是哪个～</div>
+      <button class="copy-btn" data-target="pin">点击复制置顶评论</button>
+    </section>
+
+    <!-- 回复库 -->
+    <section class="card" id="card-replies">
+      <div class="card-head">
+        <div class="card-title"><span class="num">4</span> 评论回复库</div>
+        <span class="meta">5 条预案</span>
+      </div>
+      <div class="replies-grid">
+        
+      <div class="reply-row">
+        <span class="reply-tag">☕靠窗位</span>
+        <span class="reply-text">观察者型：你不是高冷，是在收集信息。独处是充电，观察是本能。你的天赋是洞察力——别人忽略的模式你全能…</span>
+        <button class="mini-btn" data-reply="观察者型：你不是高冷，是在收集信息。独处是充电，观察是本能。你的天赋是洞察力——别人忽略的模式你全能看到。">复制</button>
+      </div>
+
+      <div class="reply-row">
+        <span class="reply-tag">📚角落位</span>
+        <span class="reply-text">隐居者型：你不是不合群，是太享受自己的世界。你的深度思考能力是天赋，但记得偶尔出来，让别人知道你在想…</span>
+        <button class="mini-btn" data-reply="隐居者型：你不是不合群，是太享受自己的世界。你的深度思考能力是天赋，但记得偶尔出来，让别人知道你在想什么。">复制</button>
+      </div>
+
+      <div class="reply-row">
+        <span class="reply-tag">🛋️沙发位</span>
+        <span class="reply-text">连接者型：你的天赋是让人放松。别人跟你待一会就不焦虑了。你适合做桥梁型角色——团队里的润滑剂、朋友圈…</span>
+        <button class="mini-btn" data-reply="连接者型：你的天赋是让人放松。别人跟你待一会就不焦虑了。你适合做桥梁型角色——团队里的润滑剂、朋友圈的定心丸。">复制</button>
+      </div>
+
+      <div class="reply-row">
+        <span class="reply-tag">🪴植物旁</span>
+        <span class="reply-text">治愈者型：你天生能感知"生命力"。别人养不活的花你养得好，别人安慰不了的人你能治愈。你的天赋是创造生…</span>
+        <button class="mini-btn" data-reply="治愈者型：你天生能感知&quot;生命力&quot;。别人养不活的花你养得好，别人安慰不了的人你能治愈。你的天赋是创造生长环境。">复制</button>
+      </div>
+
+      <div class="reply-row">
+        <span class="reply-tag">关注我，主页还有更多性格测试，每天认识自己多一点～</span>
+        <span class="reply-text"></span>
+        <button class="mini-btn" data-reply="">复制</button>
+      </div>
+      </div>
+    </section>
+
+    <!-- 大字报 -->
+    <section class="card" id="card-cards">
+      <div class="card-head">
+        <div class="card-title"><span class="num">5</span> 大字报文字稿</div>
+        <span class="meta">7 页</span>
+      </div>
+      <div class="preview" id="prev-cards">【第1页｜封面】
+选一个让你最舒服的角落
+
+☕ 靠窗的咖啡位
+📚 书架后的角落
+🛋️ 客厅的大沙发
+🪴 有植物的阳台
+
+你的选择，暴露你的隐藏人格
+
+=== 第2页｜选项展示 ===
+四个角落，四种人格天赋
+
+☕ 靠窗 · 看风景
+📚 角落 · 不被打扰
+🛋️ 沙发 · 躺着最舒服
+🪴 阳台 · 有植物陪伴
+
+别看太久，选让你最放松的那个
+
+=== 第3页｜☕ 靠窗位 · 观察者 ===
+☕ 靠窗位 · 观察者型
+
+"你不是高冷，你是在收集信息。"
+
+你习惯退后一步看全局。别人在社交，你在读空气。
+独处对你来说是充电不是孤独。
+你的天赋：洞察力——别人忽略的模式和规律，你一眼看穿。
+最小动作：把你的观察写下来。你以为"大家都看得到"的东西，其实只有你看到了。
+
+=== 第4页｜📚 角落位 · 隐居者 ===
+📚 角落位 · 隐居者型
+
+"你不是不合群，是太享受自己的世界。"
+
+给你一本书、一杯茶、一个下午，你能自己玩一整天。
+你的内心世界比外部世界丰富十倍。
+你的天赋：深度思考——复杂问题到你手里就被拆解得干干净净。
+最小动作：每周写一篇"我在想什么"，你的思考值得被看见。
+
+=== 第5页｜🛋️ 沙发位 · 连接者 ===
+🛋️ 沙发位 · 连接者型
+
+"你不是懒，是天赋在别处。"
+
+你喜欢舒服，也擅长让别人舒服。
+朋友难过时找你，团队有矛盾时找你——你是天然的润滑剂。
+你的天赋：情绪连接——你让周围的人感到安全和放松。
+最小动作：主动扮演一次"组织者"，你会发现自己比想象中擅长。
+
+=== 第6页｜🪴 阳台位 · 治愈者 ===
+🪴 阳台位 · 治愈者型
+
+"你不是宅，是需要被生命力包围。"
+
+你养什么活什么，别人养不活的你随手就活了。
+你不是在养植物，是在和生命对话。
+你的天赋：创造生长环境——不管是对人还是对事，你都能创造出让Ta变好的条件。
+最小动作：分享一盆你养的植物在你主页，配一句你的感受。
+
+=== 第7页｜互动收尾 ===
+你选了哪个角落？
+
+评论区报坐标 👇
+找找有没有同款人格
+
+📌 关注我，下次测你的隐藏性格天赋</div>
+      <button class="copy-btn" data-target="cards">点击复制大字报全文</button>
+    </section>
+
+    <footer>
+      Generated by post-helper · 2026-08-11
+    </footer>
+  </div>
+
+  <div class="toast" id="toast">已复制 ✓</div>
+
+  <script>
+    const blocks = {
+      title: "选一个最舒服的角落，暴露你藏最深的性格天赋",
+      body:  "每个人的\"舒适区\"都不一样。\n\n有人喜欢窗边，有人喜欢角落，有人一定要背对墙——\n你无意识的选择，其实在暴露你真正的性格天赋。\n\n4个角落，凭第一感觉选一个，看看你的隐藏人格是什么 👇\n\n#性格测试 #天赋 #社交人格 #自我探索",
+      pin:   "我选了☕靠窗位，结果说我是\"观察者型\"——看完觉得确实是我。你呢？评论区告诉我是哪个～",
+      cards: "【第1页｜封面】\n选一个让你最舒服的角落\n\n☕ 靠窗的咖啡位\n📚 书架后的角落\n🛋️ 客厅的大沙发\n🪴 有植物的阳台\n\n你的选择，暴露你的隐藏人格\n\n=== 第2页｜选项展示 ===\n四个角落，四种人格天赋\n\n☕ 靠窗 · 看风景\n📚 角落 · 不被打扰\n🛋️ 沙发 · 躺着最舒服\n🪴 阳台 · 有植物陪伴\n\n别看太久，选让你最放松的那个\n\n=== 第3页｜☕ 靠窗位 · 观察者 ===\n☕ 靠窗位 · 观察者型\n\n\"你不是高冷，你是在收集信息。\"\n\n你习惯退后一步看全局。别人在社交，你在读空气。\n独处对你来说是充电不是孤独。\n你的天赋：洞察力——别人忽略的模式和规律，你一眼看穿。\n最小动作：把你的观察写下来。你以为\"大家都看得到\"的东西，其实只有你看到了。\n\n=== 第4页｜📚 角落位 · 隐居者 ===\n📚 角落位 · 隐居者型\n\n\"你不是不合群，是太享受自己的世界。\"\n\n给你一本书、一杯茶、一个下午，你能自己玩一整天。\n你的内心世界比外部世界丰富十倍。\n你的天赋：深度思考——复杂问题到你手里就被拆解得干干净净。\n最小动作：每周写一篇\"我在想什么\"，你的思考值得被看见。\n\n=== 第5页｜🛋️ 沙发位 · 连接者 ===\n🛋️ 沙发位 · 连接者型\n\n\"你不是懒，是天赋在别处。\"\n\n你喜欢舒服，也擅长让别人舒服。\n朋友难过时找你，团队有矛盾时找你——你是天然的润滑剂。\n你的天赋：情绪连接——你让周围的人感到安全和放松。\n最小动作：主动扮演一次\"组织者\"，你会发现自己比想象中擅长。\n\n=== 第6页｜🪴 阳台位 · 治愈者 ===\n🪴 阳台位 · 治愈者型\n\n\"你不是宅，是需要被生命力包围。\"\n\n你养什么活什么，别人养不活的你随手就活了。\n你不是在养植物，是在和生命对话。\n你的天赋：创造生长环境——不管是对人还是对事，你都能创造出让Ta变好的条件。\n最小动作：分享一盆你养的植物在你主页，配一句你的感受。\n\n=== 第7页｜互动收尾 ===\n你选了哪个角落？\n\n评论区报坐标 👇\n找找有没有同款人格\n\n📌 关注我，下次测你的隐藏性格天赋"
+    };
+
+    function showToast(text) {
+      const t = document.getElementById('toast');
+      t.textContent = text;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 1400);
+    }
+
+    async function copyText(text, btn) {
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (e) {
+        // 兜底方案：旧浏览器/HTTP
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed'; ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (_) {}
+        document.body.removeChild(ta);
+      }
+      btn.classList.add('copied');
+      const orig = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.textContent = orig;
+      }, 1200);
+      showToast('已复制 ✓ 切到小红书粘贴');
+    }
+
+    document.querySelectorAll('.copy-btn[data-target]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        copyText(blocks[btn.dataset.target], btn);
+      });
+    });
+
+    document.querySelectorAll('.mini-btn[data-reply]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        copyText(btn.dataset.reply, btn);
+      });
+    });
+
+    // 二维码：直接用静态图片 API（无需本地 QR 库）
+    (function () {
+      var img = document.getElementById('qr-img');
+      var urlDisplay = document.getElementById('qr-url');
+      if (!img) return;
+      var url = window.location.href.split('#')[0];
+      if (urlDisplay) urlDisplay.textContent = url;
+      img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=' + encodeURIComponent(url);
+      img.onerror = function () {
+        img.alt = '二维码加载失败，请直接访问 URL';
+      };
+    })();
+  </script>
+</body>
+</html>
