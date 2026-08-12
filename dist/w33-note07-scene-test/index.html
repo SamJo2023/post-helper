@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#fdf6ee" />
+  <base href="/" />
+  <title>未命名笔记 · 发布助手</title>
+  <style>
+    :root {
+      --bg: #fdf6ee;
+      --bg-card: #ffffff;
+      --text: #3a2e26;
+      --text-soft: #7a685a;
+      --accent: #e8826b;
+      --accent-deep: #c75a44;
+      --border: #efe2d0;
+      --success: #4caf50;
+      --radius: 14px;
+      --shadow: 0 2px 12px rgba(58, 46, 38, 0.06);
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap { max-width: 680px; margin: 0 auto; padding: 24px 18px 80px; }
+    header { text-align: center; padding: 8px 0 24px; }
+    header .badge {
+      display: inline-block;
+      background: rgba(232, 130, 107, 0.12);
+      color: var(--accent-deep);
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    h1 {
+      font-size: 22px;
+      margin: 12px 0 6px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .subtitle { font-size: 13px; color: var(--text-soft); margin: 0; }
+
+    .qr-card {
+      text-align: center;
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 18px 18px 14px;
+      margin-bottom: 14px;
+    }
+    .qr-card .qr-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--accent-deep);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .qr-card .qr-title .num {
+      width: 22px; height: 22px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .qr-img {
+      display: inline-block;
+      padding: 10px;
+      background: #fff;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      margin: 4px 0;
+    }
+    .qr-img img, .qr-img svg, .qr-img table {
+      display: block;
+      width: 180px;
+      height: 180px;
+    }
+    .qr-url {
+      font-size: 11px;
+      color: var(--text-soft);
+      word-break: break-all;
+      padding: 6px 4px 0;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+      line-height: 1.4;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 16px 18px;
+      margin-bottom: 14px;
+    }
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--accent-deep);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .card-title .num {
+      width: 22px; height: 22px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .meta { font-size: 11px; color: var(--text-soft); }
+
+    .preview {
+      background: #faf6f0;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 14px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 180px;
+      overflow-y: auto;
+      color: var(--text);
+      margin-bottom: 12px;
+      border: 1px dashed var(--border);
+    }
+
+    .copy-btn {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 14px 0;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      letter-spacing: 1px;
+    }
+    .copy-btn:active {
+      transform: scale(0.98);
+      background: var(--accent-deep);
+    }
+    .copy-btn.copied {
+      background: var(--success);
+    }
+
+    .replies-grid {
+      display: grid;
+      gap: 10px;
+    }
+    .reply-row {
+      display: grid;
+      grid-template-columns: 64px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: #faf6f0;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    .reply-tag {
+      background: var(--accent);
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+    }
+    .reply-text {
+      font-size: 13px;
+      color: var(--text-soft);
+      max-height: 3.2em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+    .mini-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .mini-btn:active { transform: scale(0.95); }
+    .mini-btn.copied { background: var(--success); }
+
+    .tip {
+      background: rgba(232, 130, 107, 0.08);
+      color: var(--accent-deep);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      margin: 16px 0;
+      line-height: 1.5;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 32px;
+      font-size: 11px;
+      color: var(--text-soft);
+      opacity: 0.6;
+    }
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(58, 46, 38, 0.92);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 99px;
+      font-size: 14px;
+      font-weight: 600;
+      opacity: 0;
+      transition: all 0.25s;
+      pointer-events: none;
+      z-index: 999;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <header>
+      <span class="badge">发布助手</span>
+      <h1>未命名笔记</h1>
+      <p class="subtitle">扫码打开 → 点按钮复制 → 切到小红书粘贴</p>
+    </header>
+
+    <div class="tip">💡 用法：点对应按钮 → 自动复制 → 切到小红书直接粘贴。每段都是原始格式，不会多空格。</div>
+
+    <!-- 二维码：扫码打开此页 -->
+    <section class="qr-card" id="card-qr">
+      <div class="qr-title"><span class="num">⊕</span> 扫码打开此页</div>
+      <div class="qr-img"><img id="qr-img" alt="本页 URL 二维码" /></div>
+      <div class="qr-url" id="qr-url">https://post-helper.hisamjo.live/w33-note07-scene-test/</div>
+    </section>
+
+    <!-- 标题 -->
+    <section class="card" id="card-title">
+      <div class="card-head">
+        <div class="card-title"><span class="num">1</span> 发布标题</div>
+        <span class="meta">主推 1 条</span>
+      </div>
+      <div class="preview" id="prev-title">30岁还迷茫？4个场景测出你的隐藏天赋</div>
+      <button class="copy-btn" data-target="title">点击复制标题</button>
+    </section>
+
+    <!-- 正文 -->
+    <section class="card" id="card-body">
+      <div class="card-head">
+        <div class="card-title"><span class="num">2</span> 小红书正文</div>
+        <span class="meta">102 字</span>
+      </div>
+      <div class="preview" id="prev-body">30岁了还问自己"我适合做什么"——
+
+不是你不行，是你从没用自己的标准看过自己。
+
+下面4个生活场景，别多想，凭第一反应选。你的选择会暴露你被藏起来的天赋👇
+
+#30岁 #自我探索 #隐藏天赋 #迷茫</div>
+      <button class="copy-btn" data-target="body">点击复制正文</button>
+    </section>
+
+    <!-- 置顶评论 -->
+    <section class="card" id="card-pin">
+      <div class="card-head">
+        <div class="card-title"><span class="num">3</span> 置顶评论</div>
+        <span class="meta">发布后立刻粘贴</span>
+      </div>
+      <div class="preview" id="prev-pin">我测出来是创造力型——终于明白为什么坐办公室那么痛苦。你测出来是什么？评论区告诉我👇</div>
+      <button class="copy-btn" data-target="pin">点击复制置顶评论</button>
+    </section>
+
+    <!-- 回复库 -->
+    <section class="card" id="card-replies">
+      <div class="card-head">
+        <div class="card-title"><span class="num">4</span> 评论回复库</div>
+        <span class="meta">5 条预案</span>
+      </div>
+      <div class="replies-grid">
+        
+      <div class="reply-row">
+        <span class="reply-tag">创造力型</span>
+        <span class="reply-text">你不是天马行空，是需要从0到1的活法。重复性工作让你枯萎。试试把你脑子里一直在想的那个项目写下来，哪…</span>
+        <button class="mini-btn" data-reply="你不是天马行空，是需要从0到1的活法。重复性工作让你枯萎。试试把你脑子里一直在想的那个项目写下来，哪怕只写一页。">复制</button>
+      </div>
+
+      <div class="reply-row">
+        <span class="reply-tag">分析力型</span>
+        <span class="reply-text">你不是想太多，是天生适合做深度思考的事。你的优势在"把复杂问题拆清楚"，试试在现在的工作里多做分析和…</span>
+        <button class="mini-btn" data-reply="你不是想太多，是天生适合做深度思考的事。你的优势在&quot;把复杂问题拆清楚&quot;，试试在现在的工作里多做分析和策略。">复制</button>
+      </div>
+
+      <div class="reply-row">
+        <span class="reply-tag">连接力型</span>
+        <span class="reply-text">你不是社交达人，是天然的关系建筑师。你的超能力是让人感到被理解。适合做教育、咨询、客户成功型工作。</span>
+        <button class="mini-btn" data-reply="你不是社交达人，是天然的关系建筑师。你的超能力是让人感到被理解。适合做教育、咨询、客户成功型工作。">复制</button>
+      </div>
+
+      <div class="reply-row">
+        <span class="reply-tag">执行力型</span>
+        <span class="reply-text">你不是没有创造力，是你的优势在"把事做成"。别人想一堆你做完了，别人放弃你还在跑。选一个有长期复利的…</span>
+        <button class="mini-btn" data-reply="你不是没有创造力，是你的优势在&quot;把事做成&quot;。别人想一堆你做完了，别人放弃你还在跑。选一个有长期复利的赛道，剩下的交给时间。">复制</button>
+      </div>
+
+      <div class="reply-row">
+        <span class="reply-tag">测完的姐妹评论区报个到🙋‍♀️</span>
+        <span class="reply-text">看看哪种最多</span>
+        <button class="mini-btn" data-reply="看看哪种最多">复制</button>
+      </div>
+      </div>
+    </section>
+
+    <!-- 大字报 -->
+    <section class="card" id="card-cards">
+      <div class="card-head">
+        <div class="card-title"><span class="num">5</span> 大字报文字稿</div>
+        <span class="meta">8 页</span>
+      </div>
+      <div class="preview" id="prev-cards">【第1页｜封面】
+30岁还迷茫？
+
+不是你不行
+是你没找到
+被藏起来的天赋
+
+4个生活场景
+测出你天生该往哪走
+
+=== 第2页｜4个场景 ===
+别多想，凭第一反应选 👇
+
+1. 周末醒来，没人催你。你先？
+🅰️ 脑子里冒出新点子，赶紧记下
+🅱️ 列出今天要搞定的几件事
+
+2. 朋友说"我好焦虑"，你第一反应？
+🅰️ 问清楚"因为什么"，帮她分析
+🅱️ 说"我懂"，先陪她待一会儿
+
+3. 一个人待着，你最容易？
+🅰️ 沉迷某件事，三小时后才抬头
+🅱️ 待不住，想找人聊天或出门
+
+4. 老板说"这项目随便你怎么做"？
+🅰️ 兴奋——终于能按自己想法来了
+🅱️ 压力——能不能给个明确方向？
+
+记好你的选项，翻页对答案 👉
+
+=== 第3页｜对答案 ===
+数数你选了几个 A、几个 B 👇
+
+🅰️ A 有 3-4 个
+→ 内在驱动型
+需要空间、深度、自由
+翻第4页看 🎨 创造力
+翻第5页看 🧠 分析力
+
+🅱️ B 有 3-4 个
+→ 外在驱动型
+需要反馈、行动、连接
+翻第6页看 🤝 连接力
+翻第7页看 ⚡ 执行力
+
+⚡ A B 各 2 个
+→ 混合型，4 页都看
+最戳你的那个就是答案 ✨
+
+=== 第4页｜🎨 创造力型 ===
+🎨 创造力型
+
+"你不是天马行空，是需要从0到1的活法。"
+
+你的能量来源是"创造新东西"。
+重复性工作让你枯萎——不是你懒，是大脑在拒绝无聊。
+
+适合的方向：内容创作、产品设计、策划、创业。
+
+最小动作：把你脑子里一直在想的那个项目写下来，哪怕只写一页。写下来就是开始。
+
+=== 第5页｜🧠 分析力型 ===
+🧠 分析力型
+
+"你不是想太多，是大脑出厂就带了分析引擎。"
+
+复杂问题到你手里被拆得清清楚楚。
+别人看到乱麻，你看到规律。
+
+适合的方向：策略、数据、研究、技术。
+
+最小动作：在现在的工作里主动做一次分析复盘，让大家看到你的价值。
+
+=== 第6页｜🤝 连接力型 ===
+🤝 连接力型
+
+"你不是社交达人，是天然的关系建筑师。"
+
+你的超能力是让人感到被理解。
+别人跟你聊完觉得"你懂我"——这是稀缺天赋。
+
+适合的方向：教育、咨询、销售、社区运营。
+
+最小动作：主动组织一次小范围分享，你会发现自己的能量。
+
+=== 第7页｜⚡ 执行力型 ===
+⚡ 执行力型
+
+"你不是没有创造力，是你的天赋在'把事做成'。"
+
+别人还在想，你已经做完了。
+别人放弃了，你还在跑。
+
+适合的方向：项目管理、运营、创业执行。
+
+最小动作：选一个有长期复利的事（比如每天写300字），坚持30天。积累是你的超能力。
+
+=== 第8页｜互动收尾 ===
+你的隐藏天赋是什么？
+
+评论区告诉我：
+🎨 创造力 / 🧠 分析力
+🤝 连接力 / ⚡ 执行力
+
+📌 收藏这篇，下次迷茫时回来看
+关注我，每天认识自己多一点</div>
+      <button class="copy-btn" data-target="cards">点击复制大字报全文</button>
+    </section>
+
+    <footer>
+      Generated by post-helper · 2026-08-12
+    </footer>
+  </div>
+
+  <div class="toast" id="toast">已复制 ✓</div>
+
+  <script>
+    const blocks = {
+      title: "30岁还迷茫？4个场景测出你的隐藏天赋",
+      body:  "30岁了还问自己\"我适合做什么\"——\n\n不是你不行，是你从没用自己的标准看过自己。\n\n下面4个生活场景，别多想，凭第一反应选。你的选择会暴露你被藏起来的天赋👇\n\n#30岁 #自我探索 #隐藏天赋 #迷茫",
+      pin:   "我测出来是创造力型——终于明白为什么坐办公室那么痛苦。你测出来是什么？评论区告诉我👇",
+      cards: "【第1页｜封面】\n30岁还迷茫？\n\n不是你不行\n是你没找到\n被藏起来的天赋\n\n4个生活场景\n测出你天生该往哪走\n\n=== 第2页｜4个场景 ===\n别多想，凭第一反应选 👇\n\n1. 周末醒来，没人催你。你先？\n🅰️ 脑子里冒出新点子，赶紧记下\n🅱️ 列出今天要搞定的几件事\n\n2. 朋友说\"我好焦虑\"，你第一反应？\n🅰️ 问清楚\"因为什么\"，帮她分析\n🅱️ 说\"我懂\"，先陪她待一会儿\n\n3. 一个人待着，你最容易？\n🅰️ 沉迷某件事，三小时后才抬头\n🅱️ 待不住，想找人聊天或出门\n\n4. 老板说\"这项目随便你怎么做\"？\n🅰️ 兴奋——终于能按自己想法来了\n🅱️ 压力——能不能给个明确方向？\n\n记好你的选项，翻页对答案 👉\n\n=== 第3页｜对答案 ===\n数数你选了几个 A、几个 B 👇\n\n🅰️ A 有 3-4 个\n→ 内在驱动型\n需要空间、深度、自由\n翻第4页看 🎨 创造力\n翻第5页看 🧠 分析力\n\n🅱️ B 有 3-4 个\n→ 外在驱动型\n需要反馈、行动、连接\n翻第6页看 🤝 连接力\n翻第7页看 ⚡ 执行力\n\n⚡ A B 各 2 个\n→ 混合型，4 页都看\n最戳你的那个就是答案 ✨\n\n=== 第4页｜🎨 创造力型 ===\n🎨 创造力型\n\n\"你不是天马行空，是需要从0到1的活法。\"\n\n你的能量来源是\"创造新东西\"。\n重复性工作让你枯萎——不是你懒，是大脑在拒绝无聊。\n\n适合的方向：内容创作、产品设计、策划、创业。\n\n最小动作：把你脑子里一直在想的那个项目写下来，哪怕只写一页。写下来就是开始。\n\n=== 第5页｜🧠 分析力型 ===\n🧠 分析力型\n\n\"你不是想太多，是大脑出厂就带了分析引擎。\"\n\n复杂问题到你手里被拆得清清楚楚。\n别人看到乱麻，你看到规律。\n\n适合的方向：策略、数据、研究、技术。\n\n最小动作：在现在的工作里主动做一次分析复盘，让大家看到你的价值。\n\n=== 第6页｜🤝 连接力型 ===\n🤝 连接力型\n\n\"你不是社交达人，是天然的关系建筑师。\"\n\n你的超能力是让人感到被理解。\n别人跟你聊完觉得\"你懂我\"——这是稀缺天赋。\n\n适合的方向：教育、咨询、销售、社区运营。\n\n最小动作：主动组织一次小范围分享，你会发现自己的能量。\n\n=== 第7页｜⚡ 执行力型 ===\n⚡ 执行力型\n\n\"你不是没有创造力，是你的天赋在'把事做成'。\"\n\n别人还在想，你已经做完了。\n别人放弃了，你还在跑。\n\n适合的方向：项目管理、运营、创业执行。\n\n最小动作：选一个有长期复利的事（比如每天写300字），坚持30天。积累是你的超能力。\n\n=== 第8页｜互动收尾 ===\n你的隐藏天赋是什么？\n\n评论区告诉我：\n🎨 创造力 / 🧠 分析力\n🤝 连接力 / ⚡ 执行力\n\n📌 收藏这篇，下次迷茫时回来看\n关注我，每天认识自己多一点"
+    };
+
+    function showToast(text) {
+      const t = document.getElementById('toast');
+      t.textContent = text;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 1400);
+    }
+
+    async function copyText(text, btn) {
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (e) {
+        // 兜底方案：旧浏览器/HTTP
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed'; ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (_) {}
+        document.body.removeChild(ta);
+      }
+      btn.classList.add('copied');
+      const orig = btn.textContent;
+      btn.textContent = '已复制 ✓';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.textContent = orig;
+      }, 1200);
+      showToast('已复制 ✓ 切到小红书粘贴');
+    }
+
+    document.querySelectorAll('.copy-btn[data-target]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        copyText(blocks[btn.dataset.target], btn);
+      });
+    });
+
+    document.querySelectorAll('.mini-btn[data-reply]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        copyText(btn.dataset.reply, btn);
+      });
+    });
+
+    // 二维码：直接用静态图片 API（无需本地 QR 库）
+    (function () {
+      var img = document.getElementById('qr-img');
+      var urlDisplay = document.getElementById('qr-url');
+      if (!img) return;
+      var url = window.location.href.split('#')[0];
+      if (urlDisplay) urlDisplay.textContent = url;
+      img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=' + encodeURIComponent(url);
+      img.onerror = function () {
+        img.alt = '二维码加载失败，请直接访问 URL';
+      };
+    })();
+  </script>
+</body>
+</html>
