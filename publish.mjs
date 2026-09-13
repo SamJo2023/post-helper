@@ -53,7 +53,16 @@ function getPublishId(content) {
 
 function getTitleFromH1(content) {
   const m = content.match(/^#\s+(.+)$/m);
-  return m ? m[1].trim() : '未命名笔记';
+  return m ? m[1].trim() : null;
+}
+
+// 页面标题优先级：POST_TITLE 块（笔记格式的权威来源）→ Markdown H1 → 兜底
+// 注意：草稿箱笔记按格式规范不写 H1，标题只在 POST_TITLE 块里，
+//      所以 block 必须排在 H1 之前，否则整站标题都会是「未命名笔记」。
+function resolveTitle(content, blocks) {
+  const fromBlock = (blocks?.TITLE?.text || '').split('\n')[0].trim();
+  if (fromBlock) return fromBlock;
+  return getTitleFromH1(content) || '未命名笔记';
 }
 
 // 提取一个标记块，返回 { text, found }
@@ -187,7 +196,7 @@ function renderNotePage(content) {
       `    publish_id: xiang-tai-duo    # 用作 URL: post-helper.hisamjo.live/<publish_id>/`,
     ].join('\n'));
   }
-  const title = getTitleFromH1(content);
+  const title = resolveTitle(content, blocks);
   const replies = parseReplies(blocks.REPLIES.text);
 
   info(`使用 publish_id：${id}`);
@@ -253,7 +262,7 @@ function renderRootPage(vaultPath) {
   const content = readFileSync(latest.fp, 'utf8');
   const blocks  = extractAll(content);
   const replies = parseReplies(blocks.REPLIES.text);
-  const title   = getTitleFromH1(content);
+  const title   = resolveTitle(content, blocks);
   const template = readFileSync(TEMPLATE_PATH, 'utf8');
   const html = render(template, {
     title,
